@@ -1,0 +1,127 @@
+version: '3.8'
+
+services:
+  lims-server:
+    build:
+      context: ./lims-server
+      dockerfile: Dockerfile
+    container_name: lims-server
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/lims?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root123
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_DATA_REDIS_PORT=6379
+      - SPRING_DATA_REDIS_PASSWORD=
+      - JWT_SECRET=lims-secret-key-2024-environment-detection-labs
+      - MINIO_ENDPOINT=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    networks:
+      - lims-net
+    depends_on:
+      - mysql
+      - redis
+
+  lims-web:
+    build:
+      context: ./lims-web
+      dockerfile: Dockerfile
+    container_name: lims-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - lims-net
+    depends_on:
+      - lims-server
+
+  mysql:
+    image: mysql:8.0
+    container_name: lims-mysql
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=root123
+      - MYSQL_DATABASE=lims
+      - MYSQL_USER=lims
+      - MYSQL_PASSWORD=lims123
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+      - --max_connections=1000
+      - --innodb_buffer_pool_size=512M
+    networks:
+      - lims-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: lims-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes --requirepass ""
+    networks:
+      - lims-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: lims-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - TZ=Asia/Shanghai
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    volumes:
+      - minio-data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - lims-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+
+networks:
+  lims-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  redis-data:
+    driver: local
+  minio-data:
+    driver: local

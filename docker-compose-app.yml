@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  lims-server:
+    build:
+      context: ./lims-server
+      dockerfile: Dockerfile
+    container_name: lims-server
+    restart: unless-stopped
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    environment:
+      - TZ=Asia/Shanghai
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-prod}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT:-6379}
+      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD:-}
+      - SPRING_DATA_REDIS_DATABASE=${SPRING_DATA_REDIS_DATABASE:-0}
+      - JWT_SECRET=${JWT_SECRET:-lims-secret-key-2024-environment-detection-labs}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-86400000}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME:-lims}
+    networks:
+      - lims-net
+
+  lims-web:
+    build:
+      context: ./lims-web
+      dockerfile: Dockerfile
+    container_name: lims-web
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-80}:80"
+    environment:
+      - TZ=Asia/Shanghai
+    networks:
+      - lims-net
+    depends_on:
+      - lims-server
+
+networks:
+  lims-net:
+    driver: bridge
