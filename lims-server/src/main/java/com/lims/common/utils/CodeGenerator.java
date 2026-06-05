@@ -16,6 +16,12 @@ public class CodeGenerator {
     private static final AtomicInteger reportSeq = new AtomicInteger(1);
     private static final AtomicInteger changeSeq = new AtomicInteger(1);
     private static final AtomicInteger subcontractSeq = new AtomicInteger(1);
+    private static final AtomicInteger samplingPlanSeq = new AtomicInteger(1);
+    private static final AtomicInteger samplingTaskSeq = new AtomicInteger(1);
+    private static final AtomicInteger sampleSeq = new AtomicInteger(1);
+    private static final AtomicInteger transferSeq = new AtomicInteger(1);
+    private static final AtomicInteger equipmentSeq = new AtomicInteger(1);
+    private static final AtomicInteger borrowSeq = new AtomicInteger(1);
 
     private static final String PREFIX_CUSTOMER = "CUS";
     private static final String PREFIX_CONTRACT = "CON";
@@ -24,6 +30,12 @@ public class CodeGenerator {
     private static final String PREFIX_REPORT = "RPT";
     private static final String PREFIX_CHANGE = "CHG";
     private static final String PREFIX_SUBCONTRACT = "SUB";
+    private static final String PREFIX_SAMPLING_PLAN = "SP";
+    private static final String PREFIX_SAMPLING_TASK = "ST";
+    private static final String PREFIX_SAMPLE = "SPL";
+    private static final String PREFIX_TRANSFER = "TRF";
+    private static final String PREFIX_EQUIPMENT = "EQ";
+    private static final String PREFIX_BORROW = "BRW";
 
     public String generateCustomerNo() {
         return generateCode(PREFIX_CUSTOMER, customerSeq);
@@ -51,6 +63,30 @@ public class CodeGenerator {
 
     public String generateSubcontractNo() {
         return generateCode(PREFIX_SUBCONTRACT, subcontractSeq);
+    }
+
+    public String generateSamplingPlanNo() {
+        return generateCode(PREFIX_SAMPLING_PLAN, samplingPlanSeq);
+    }
+
+    public String generateSamplingTaskNo() {
+        return generateCode(PREFIX_SAMPLING_TASK, samplingTaskSeq);
+    }
+
+    public String generateSampleNo() {
+        return generateCode(PREFIX_SAMPLE, sampleSeq);
+    }
+
+    public String generateTransferNo() {
+        return generateCode(PREFIX_TRANSFER, transferSeq);
+    }
+
+    public String generateEquipmentNo() {
+        return generateCode(PREFIX_EQUIPMENT, equipmentSeq);
+    }
+
+    public String generateBorrowNo() {
+        return generateCode(PREFIX_BORROW, borrowSeq);
     }
 
     private String generateCode(String prefix, AtomicInteger seq) {

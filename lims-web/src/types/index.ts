@@ -645,3 +645,346 @@ export interface DictItemStandard {
   limitValue?: string
   remark?: string
 }
+
+export interface SamplingPlanQuery extends PageQuery {
+  planNo?: string
+  planName?: string
+  entrustId?: number
+  status?: number
+  samplingType?: number
+  planDateStart?: string
+  planDateEnd?: string
+}
+
+export interface SamplingPointSaveDTO {
+  id?: number
+  planId?: number
+  pointCode: string
+  pointName: string
+  longitude?: number
+  latitude?: number
+  samplingDepth?: string
+  samplingFrequency?: string
+  samplingItems?: string
+  remark?: string
+}
+
+export interface SamplingPlanSaveDTO {
+  id?: number
+  planNo?: string
+  planName: string
+  entrustId?: number
+  entrustNo?: string
+  planDate: string
+  samplingType?: number
+  samplingTypeText?: string
+  samplerIds?: string
+  samplerNames?: string
+  equipmentIds?: string
+  equipmentNames?: string
+  containerIds?: string
+  containerNames?: string
+  remark?: string
+  points: SamplingPointSaveDTO[]
+}
+
+export interface TaskAssignItem {
+  pointId: number
+  samplerId: number
+  samplerName: string
+}
+
+export interface TaskAssignDTO {
+  planId: number
+  taskList: TaskAssignItem[]
+}
+
+export interface FieldSamplingDTO {
+  taskId: number
+  longitude?: number
+  latitude?: number
+  temperature?: number
+  ph?: number
+  weather?: string
+  windSpeed?: string
+  photos?: string
+  samplingTime?: string
+  samplingPerson?: string
+  qcSampleFlag?: number
+  offlineFlag?: number
+  remark?: string
+  samples: SampleRecordSaveDTO[]
+}
+
+export interface SampleRecordSaveDTO {
+  id?: number
+  taskId?: number
+  planId?: number
+  pointId?: number
+  sampleNo?: string
+  qrCode?: string
+  sampleName?: string
+  sampleType?: string
+  sampleStatus?: number
+  temperature?: number
+  ph?: number
+  storageCondition?: number
+  qcFlag?: number
+  qcType?: number
+  samplingDepth?: string
+  samplingTime?: string
+  containerType?: string
+  preservative?: string
+  remark?: string
+}
+
+export interface SamplingTaskQuery extends PageQuery {
+  taskNo?: string
+  planId?: number
+  samplerId?: number
+  status?: number
+  qcSampleFlag?: number
+  offlineFlag?: number
+  assignTimeStart?: string
+  assignTimeEnd?: string
+}
+
+export interface SampleTransferSaveDTO {
+  id?: number
+  transferNo?: string
+  transferType?: number
+  planId?: number
+  planNo?: string
+  samplerId?: number
+  samplerName?: string
+  receiverId?: number
+  receiverName?: string
+  transferTime?: string
+  sampleQuantity?: number
+  transferStatus?: number
+  transferRemark?: string
+  sampleIds?: string
+}
+
+export interface SampleTransferQuery extends PageQuery {
+  transferNo?: string
+  planId?: number
+  transferType?: number
+  transferStatus?: number
+  samplerId?: number
+  receiverId?: number
+  transferTimeStart?: string
+  transferTimeEnd?: string
+}
+
+export interface EquipmentSaveDTO {
+  id?: number
+  equipmentNo?: string
+  equipmentName: string
+  equipmentType?: number
+  specification?: string
+  model?: string
+  manufacturer?: string
+  purchaseDate?: string
+  lastCalibrationDate?: string
+  nextCalibrationDate?: string
+  borrowStatus?: number
+  status?: number
+  remark?: string
+}
+
+export interface EquipmentQuery extends PageQuery {
+  equipmentNo?: string
+  equipmentName?: string
+  equipmentType?: number
+  borrowStatus?: number
+  status?: number
+}
+
+export interface EquipmentBorrowSaveDTO {
+  id?: number
+  borrowNo?: string
+  equipmentId: number
+  equipmentName?: string
+  borrowerId?: number
+  borrowerName?: string
+  borrowDate?: string
+  expectedReturnDate?: string
+  actualReturnDate?: string
+  returnStatus?: number
+  borrowPurpose?: string
+  checkResult?: string
+  damageDescription?: string
+  remark?: string
+}
+
+export interface EquipmentBorrowQuery extends PageQuery {
+  borrowNo?: string
+  equipmentId?: number
+  borrowerId?: number
+  returnStatus?: number
+  borrowDateStart?: string
+  borrowDateEnd?: string
+}
+
+export interface SamplingPlanVO {
+  id: number
+  planNo: string
+  planName: string
+  entrustId?: number
+  entrustNo?: string
+  planDate: string
+  samplingType?: number
+  samplingTypeName?: string
+  samplerNames?: string
+  equipmentNames?: string
+  containerNames?: string
+  pointCount?: number
+  taskCount?: number
+  status: number
+  statusName: string
+  remark?: string
+  createBy?: number
+  createByName?: string
+  createTime: string
+  updateTime?: string
+}
+
+export interface SamplingPlanDetailVO extends SamplingPlanVO {
+  points?: SamplingPointVO[]
+  tasks?: SamplingTaskVO[]
+}
+
+export interface SamplingPointVO {
+  id: number
+  planId: number
+  pointCode: string
+  pointName: string
+  longitude?: number
+  latitude?: number
+  samplingDepth?: string
+  samplingFrequency?: string
+  samplingItems?: string
+  remark?: string
+  createTime?: string
+}
+
+export interface SamplingTaskVO {
+  id: number
+  taskNo: string
+  planId: number
+  planNo?: string
+  planName?: string
+  pointId?: number
+  pointCode?: string
+  pointName?: string
+  samplerId?: number
+  samplerName?: string
+  assignTime?: string
+  actualSamplingDate?: string
+  temperature?: number
+  ph?: number
+  weather?: string
+  qcSampleFlag?: number
+  qcSampleFlagName?: string
+  offlineFlag?: number
+  offlineFlagName?: string
+  sampleCount?: number
+  status: number
+  statusName: string
+  remark?: string
+  createTime?: string
+}
+
+export interface SamplingTaskDetailVO extends SamplingTaskVO {
+  longitude?: number
+  latitude?: number
+  windSpeed?: string
+  photos?: string
+  samplingTime?: string
+  samplingPerson?: string
+  samples?: SampleRecordVO[]
+}
+
+export interface SampleRecordVO {
+  id: number
+  sampleNo: string
+  qrCode?: string
+  sampleName?: string
+  sampleType?: string
+  sampleStatus?: number
+  sampleStatusName?: string
+  temperature?: number
+  ph?: number
+  storageCondition?: number
+  storageConditionName?: string
+  qcFlag?: number
+  qcFlagName?: string
+  qcType?: number
+  qcTypeName?: string
+  samplingDepth?: string
+  samplingTime?: string
+  containerType?: string
+  preservative?: string
+  remark?: string
+  createTime?: string
+}
+
+export interface SampleTransferVO {
+  id: number
+  transferNo: string
+  transferType?: number
+  transferTypeName?: string
+  planId?: number
+  planNo?: string
+  samplerId?: number
+  samplerName?: string
+  receiverId?: number
+  receiverName?: string
+  transferTime?: string
+  sampleQuantity?: number
+  transferStatus?: number
+  transferStatusName?: string
+  transferRemark?: string
+  createTime?: string
+}
+
+export interface EquipmentVO {
+  id: number
+  equipmentNo: string
+  equipmentName: string
+  equipmentType?: number
+  equipmentTypeName?: string
+  specification?: string
+  model?: string
+  manufacturer?: string
+  purchaseDate?: string
+  lastCalibrationDate?: string
+  nextCalibrationDate?: string
+  borrowStatus?: number
+  borrowStatusName?: string
+  status?: number
+  statusName?: string
+  remark?: string
+  createTime?: string
+}
+
+export interface EquipmentBorrowVO {
+  id: number
+  borrowNo: string
+  equipmentId: number
+  equipmentName?: string
+  equipmentNo?: string
+  borrowerId?: number
+  borrowerName?: string
+  borrowDate?: string
+  expectedReturnDate?: string
+  actualReturnDate?: string
+  returnStatus?: number
+  returnStatusName?: string
+  borrowPurpose?: string
+  checkResult?: string
+  damageDescription?: string
+  remark?: string
+  createTime?: string
+}
