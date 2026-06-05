@@ -28,5 +28,5 @@ public enum ResultCode {
     BIZ_ERROR(9999, "业务异常");
 
     private final Integer code;
-    private final String msg;
+    private final String message;
 }

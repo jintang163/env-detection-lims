@@ -20,7 +20,7 @@ import java.util.List;
 
 @Api(tags = "客户管理")
 @RestController
-@RequestMapping("/api/customer")
+@RequestMapping("/customer")
 public class CustomerController {
 
     @Autowired

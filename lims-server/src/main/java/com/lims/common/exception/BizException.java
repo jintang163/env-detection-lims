@@ -19,7 +19,7 @@ public class BizException extends RuntimeException {
     }
 
     public BizException(ResultCode resultCode) {
-        super(resultCode.getMsg());
+        super(resultCode.getMessage());
         this.code = resultCode.getCode();
     }
 

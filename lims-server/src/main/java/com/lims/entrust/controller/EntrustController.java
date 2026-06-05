@@ -15,7 +15,7 @@ import javax.validation.Valid;
 
 @Api(tags = "委托单管理")
 @RestController
-@RequestMapping("/api/entrust")
+@RequestMapping("/entrust")
 public class EntrustController {
 
     @Autowired

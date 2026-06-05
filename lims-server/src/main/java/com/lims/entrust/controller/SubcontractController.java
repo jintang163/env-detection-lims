@@ -14,7 +14,7 @@ import javax.validation.Valid;
 
 @Api(tags = "分包管理")
 @RestController
-@RequestMapping("/api/subcontract")
+@RequestMapping("/subcontract")
 public class SubcontractController {
 
     @Autowired

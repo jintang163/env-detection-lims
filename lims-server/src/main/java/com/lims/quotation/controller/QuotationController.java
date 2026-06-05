@@ -16,7 +16,7 @@ import javax.validation.Valid;
 
 @Api(tags = "报价单管理")
 @RestController
-@RequestMapping("/api/quotation")
+@RequestMapping("/quotation")
 public class QuotationController {
 
     @Autowired

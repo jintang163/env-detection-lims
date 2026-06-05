@@ -3,6 +3,7 @@ package com.lims.security.controller;
 import com.lims.common.result.Result;
 import com.lims.security.dto.LoginDTO;
 import com.lims.security.dto.LoginVO;
+import com.lims.security.dto.UserInfo;
 import com.lims.security.entity.LoginUser;
 import com.lims.security.utils.JwtUtil;
 import com.lims.system.entity.SysUser;
@@ -60,15 +61,20 @@ public class AuthController {
         List<String> roles = sysUserMapper.selectRoleCodesByUserId(user.getId());
         List<String> permissions = loginUser.getPermissions();
 
-        LoginVO vo = new LoginVO(
-                token,
+        UserInfo userInfo = new UserInfo(
                 user.getId(),
                 user.getUsername(),
                 user.getRealName(),
+                user.getPhone(),
+                user.getEmail(),
                 user.getAvatar(),
+                user.getDeptId(),
+                user.getStatus(),
                 roles,
                 permissions
         );
+
+        LoginVO vo = new LoginVO(token, userInfo);
 
         return Result.success(vo);
     }
@@ -90,15 +96,20 @@ public class AuthController {
         SysUser user = loginUser.getUser();
         List<String> roles = sysUserMapper.selectRoleCodesByUserId(user.getId());
 
-        LoginVO vo = new LoginVO(
-                null,
+        UserInfo userInfo = new UserInfo(
                 user.getId(),
                 user.getUsername(),
                 user.getRealName(),
+                user.getPhone(),
+                user.getEmail(),
                 user.getAvatar(),
+                user.getDeptId(),
+                user.getStatus(),
                 roles,
                 loginUser.getPermissions()
         );
+
+        LoginVO vo = new LoginVO(null, userInfo);
 
         return Result.success(vo);
     }

@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Api(tags = "合同管理")
 @RestController
-@RequestMapping("/api/contract")
+@RequestMapping("/contract")
 public class ContractController {
 
     @Autowired
