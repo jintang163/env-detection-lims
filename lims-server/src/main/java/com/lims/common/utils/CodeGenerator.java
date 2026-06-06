@@ -22,6 +22,10 @@ public class CodeGenerator {
     private static final AtomicInteger transferSeq = new AtomicInteger(1);
     private static final AtomicInteger equipmentSeq = new AtomicInteger(1);
     private static final AtomicInteger borrowSeq = new AtomicInteger(1);
+    private static final AtomicInteger detectionTaskSeq = new AtomicInteger(1);
+    private static final AtomicInteger standardMethodSeq = new AtomicInteger(1);
+    private static final AtomicInteger schedulePlanSeq = new AtomicInteger(1);
+    private static final AtomicInteger userQualificationSeq = new AtomicInteger(1);
 
     private static final String PREFIX_CUSTOMER = "CUS";
     private static final String PREFIX_CONTRACT = "CON";
@@ -36,6 +40,10 @@ public class CodeGenerator {
     private static final String PREFIX_TRANSFER = "TRF";
     private static final String PREFIX_EQUIPMENT = "EQ";
     private static final String PREFIX_BORROW = "BRW";
+    private static final String PREFIX_DETECTION_TASK = "DT";
+    private static final String PREFIX_STANDARD_METHOD = "SM";
+    private static final String PREFIX_SCHEDULE_PLAN = "SPL";
+    private static final String PREFIX_USER_QUALIFICATION = "UQ";
 
     public String generateCustomerNo() {
         return generateCode(PREFIX_CUSTOMER, customerSeq);
@@ -87,6 +95,22 @@ public class CodeGenerator {
 
     public String generateBorrowNo() {
         return generateCode(PREFIX_BORROW, borrowSeq);
+    }
+
+    public String generateDetectionTaskNo() {
+        return generateCode(PREFIX_DETECTION_TASK, detectionTaskSeq);
+    }
+
+    public String generateStandardMethodNo() {
+        return generateCode(PREFIX_STANDARD_METHOD, standardMethodSeq);
+    }
+
+    public String generateSchedulePlanNo() {
+        return generateCode(PREFIX_SCHEDULE_PLAN, schedulePlanSeq);
+    }
+
+    public String generateUserQualificationNo() {
+        return generateCode(PREFIX_USER_QUALIFICATION, userQualificationSeq);
     }
 
     private String generateCode(String prefix, AtomicInteger seq) {
