@@ -85,6 +85,11 @@ import {
   FileTextOutlined,
   FormOutlined,
   DollarOutlined,
+  QrcodeOutlined,
+  DatabaseOutlined,
+  SwapOutlined,
+  SaveOutlined,
+  DeleteOutlined,
   DownOutlined,
   LogoutOutlined
 } from '@ant-design/icons-vue'
@@ -103,7 +108,13 @@ const menus = [
   { path: '/customer', title: '客户管理', icon: UserOutlined },
   { path: '/contract', title: '合同管理', icon: FileTextOutlined },
   { path: '/entrust', title: '委托单管理', icon: FormOutlined },
-  { path: '/quotation', title: '报价单管理', icon: DollarOutlined }
+  { path: '/quotation', title: '报价单管理', icon: DollarOutlined },
+  { path: '/sample-register', title: '样品登记', icon: FormOutlined },
+  { path: '/sample-label', title: '样品标识', icon: QrcodeOutlined },
+  { path: '/sample-storage', title: '样品存储', icon: DatabaseOutlined },
+  { path: '/sample-transfer', title: '样品流转跟踪', icon: SwapOutlined },
+  { path: '/sample-retain', title: '留样管理', icon: SaveOutlined },
+  { path: '/sample-disposal', title: '样品处置', icon: DeleteOutlined }
 ]
 
 const currentTitle = computed(() => {

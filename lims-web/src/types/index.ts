@@ -988,3 +988,608 @@ export interface EquipmentBorrowVO {
   remark?: string
   createTime?: string
 }
+
+export interface SampleQuery extends PageQuery {
+  sampleCode?: string
+  sampleName?: string
+  pointName?: string
+  matrix?: string
+  sampleStatus?: number
+  entrustId?: number
+  createTimeStart?: string
+  createTimeEnd?: string
+}
+
+export interface SampleItemSaveDTO {
+  id?: number
+  itemId: number
+  itemCode?: string
+  itemName?: string
+  standardId?: number
+  standardNo?: string
+  standardName?: string
+  unit?: string
+  limitValue?: string
+}
+
+export interface SampleSaveDTO {
+  id?: number
+  sampleCode?: string
+  sampleName: string
+  pointId?: number
+  pointCode?: string
+  pointName?: string
+  samplingTime?: string
+  matrix?: string
+  entrustId?: number
+  entrustNo?: string
+  sampleQuantity?: number
+  sampleUnit?: string
+  storageCondition?: number
+  preservative?: string
+  containerType?: string
+  samplerId?: number
+  samplerName?: string
+  receiverId?: number
+  receiverName?: string
+  receiveTime?: string
+  remark?: string
+  items: SampleItemSaveDTO[]
+}
+
+export interface SampleImportDTO {
+  file: File
+}
+
+export interface SampleGenerateCodeDTO {
+  prefix?: string
+  count: number
+}
+
+export interface SampleVO {
+  id: number
+  sampleCode: string
+  sampleName: string
+  pointId?: number
+  pointCode?: string
+  pointName?: string
+  samplingTime?: string
+  matrix?: string
+  matrixName?: string
+  entrustId?: number
+  entrustNo?: string
+  sampleQuantity?: number
+  sampleUnit?: string
+  storageCondition?: number
+  storageConditionName?: string
+  preservative?: string
+  containerType?: string
+  samplerId?: number
+  samplerName?: string
+  receiverId?: number
+  receiverName?: string
+  receiveTime?: string
+  sampleStatus?: number
+  sampleStatusName?: string
+  qrCode?: string
+  barcode?: string
+  itemCount?: number
+  currentLocation?: string
+  warningFlag?: number
+  warningMessage?: string
+  createTime?: string
+  createByName?: string
+}
+
+export interface SampleDetailVO extends SampleVO {
+  items?: SampleItemVO[]
+  transferLogs?: SampleTransferLogVO[]
+  storageLogs?: SampleStorageLogVO[]
+}
+
+export interface SampleItemVO {
+  id: number
+  sampleId: number
+  itemId: number
+  itemCode: string
+  itemName: string
+  standardId?: number
+  standardNo?: string
+  standardName?: string
+  unit?: string
+  limitValue?: string
+  testResult?: string
+  testUnit?: string
+  resultStatus?: number
+  resultStatusName?: string
+}
+
+export interface SampleLabelQuery extends PageQuery {
+  sampleCode?: string
+  sampleName?: string
+  labelType?: number
+  printStatus?: number
+  createTimeStart?: string
+  createTimeEnd?: string
+}
+
+export interface SampleLabelPrintDTO {
+  sampleIds: number[]
+  labelType: number
+  labelSize?: string
+  printCount?: number
+}
+
+export interface SampleLabelVO {
+  id: number
+  sampleId: number
+  sampleCode: string
+  sampleName: string
+  labelType?: number
+  labelTypeName?: string
+  qrCode?: string
+  barcode?: string
+  qrCodeUrl?: string
+  barcodeUrl?: string
+  printStatus?: number
+  printStatusName?: string
+  printTime?: string
+  printCount?: number
+  createTime?: string
+}
+
+export interface SampleStorageQuery extends PageQuery {
+  sampleCode?: string
+  sampleName?: string
+  warehouseId?: number
+  refrigeratorId?: number
+  shelfId?: number
+  storageStatus?: number
+  warningFlag?: number
+}
+
+export interface SampleStorageSaveDTO {
+  id?: number
+  sampleId: number
+  sampleCode?: string
+  warehouseId: number
+  warehouseName?: string
+  refrigeratorId?: number
+  refrigeratorName?: string
+  shelfId?: number
+  shelfName?: string
+  locationCode?: string
+  storageTime?: string
+  storageOperatorId?: number
+  storageOperatorName?: string
+  remark?: string
+}
+
+export interface SampleStorageMoveDTO {
+  id: number
+  targetWarehouseId: number
+  targetRefrigeratorId?: number
+  targetShelfId?: number
+  targetLocationCode?: string
+  moveReason?: string
+  operatorId?: number
+  operatorName?: string
+}
+
+export interface SampleInOutDTO {
+  sampleIds: number[]
+  operateType: number
+  warehouseId?: number
+  refrigeratorId?: number
+  shelfId?: number
+  locationCode?: string
+  operateTime?: string
+  operatorId?: number
+  operatorName?: string
+  remark?: string
+}
+
+export interface SampleStorageVO {
+  id: number
+  sampleId: number
+  sampleCode: string
+  sampleName: string
+  sampleQuantity?: number
+  sampleUnit?: string
+  matrix?: string
+  warehouseId: number
+  warehouseName: string
+  refrigeratorId?: number
+  refrigeratorName?: string
+  shelfId?: number
+  shelfName?: string
+  locationCode?: string
+  storageTime?: string
+  storageOperatorName?: string
+  storageStatus?: number
+  storageStatusName?: string
+  warningFlag?: number
+  warningFlagName?: string
+  warningMessage?: string
+  expiryDate?: string
+  remainingDays?: number
+  currentQuantity?: number
+  createTime?: string
+}
+
+export interface SampleStorageLogVO {
+  id: number
+  sampleId: number
+  sampleCode: string
+  sampleName: string
+  operateType: number
+  operateTypeName: string
+  warehouseId?: number
+  warehouseName?: string
+  refrigeratorId?: number
+  refrigeratorName?: string
+  shelfId?: number
+  shelfName?: string
+  locationCode?: string
+  operateTime?: string
+  operatorName?: string
+  remark?: string
+}
+
+export interface StorageWarehouseSaveDTO {
+  id?: number
+  warehouseCode: string
+  warehouseName: string
+  warehouseType?: number
+  temperatureMin?: number
+  temperatureMax?: number
+  humidityMin?: number
+  humidityMax?: number
+  location?: string
+  managerId?: number
+  managerName?: string
+  status?: number
+  remark?: string
+}
+
+export interface StorageRefrigeratorSaveDTO {
+  id?: number
+  warehouseId: number
+  refrigeratorCode: string
+  refrigeratorName: string
+  temperatureMin?: number
+  temperatureMax?: number
+  currentTemperature?: number
+  status?: number
+  remark?: string
+}
+
+export interface StorageShelfSaveDTO {
+  id?: number
+  refrigeratorId?: number
+  warehouseId?: number
+  shelfCode: string
+  shelfName: string
+  layerCount?: number
+  capacity?: number
+  usedCapacity?: number
+  status?: number
+  remark?: string
+}
+
+export interface StorageWarehouseVO {
+  id: number
+  warehouseCode: string
+  warehouseName: string
+  warehouseType?: number
+  warehouseTypeName?: string
+  temperatureMin?: number
+  temperatureMax?: number
+  humidityMin?: number
+  humidityMax?: number
+  location?: string
+  managerId?: number
+  managerName?: string
+  refrigeratorCount?: number
+  shelfCount?: number
+  sampleCount?: number
+  warningCount?: number
+  status?: number
+  statusName?: string
+  createTime?: string
+}
+
+export interface StorageRefrigeratorVO {
+  id: number
+  warehouseId: number
+  warehouseName: string
+  refrigeratorCode: string
+  refrigeratorName: string
+  temperatureMin?: number
+  temperatureMax?: number
+  currentTemperature?: number
+  shelfCount?: number
+  sampleCount?: number
+  warningCount?: number
+  status?: number
+  statusName?: string
+  createTime?: string
+}
+
+export interface StorageShelfVO {
+  id: number
+  warehouseId?: number
+  refrigeratorId?: number
+  warehouseName?: string
+  refrigeratorName?: string
+  shelfCode: string
+  shelfName: string
+  layerCount?: number
+  capacity?: number
+  usedCapacity?: number
+  sampleCount?: number
+  warningCount?: number
+  status?: number
+  statusName?: string
+  createTime?: string
+}
+
+export interface SampleTransferQuery extends PageQuery {
+  sampleCode?: string
+  sampleName?: string
+  transferNode?: number
+  operatorId?: number
+  operateTimeStart?: string
+  operateTimeEnd?: string
+}
+
+export interface SampleTransferSaveDTO {
+  id?: number
+  sampleIds: number[]
+  transferNode: number
+  operatorId?: number
+  operatorName?: string
+  operateTime?: string
+  remark?: string
+  nextNode?: number
+  nextOperatorId?: number
+  nextOperatorName?: string
+}
+
+export interface SampleTransferLogVO {
+  id: number
+  sampleId: number
+  sampleCode: string
+  sampleName: string
+  transferNode: number
+  transferNodeName: string
+  operatorId?: number
+  operatorName?: string
+  operateTime?: string
+  remark?: string
+  duration?: string
+  nodeStatus?: number
+  nodeStatusName?: string
+}
+
+export interface SampleTransferTimelineVO {
+  sampleId: number
+  sampleCode: string
+  sampleName: string
+  currentNode: number
+  currentNodeName: string
+  timeline: SampleTransferTimelineItemVO[]
+}
+
+export interface SampleTransferTimelineItemVO {
+  nodeCode: string
+  nodeName: string
+  nodeOrder: number
+  status: number
+  statusName: string
+  operatorName?: string
+  operateTime?: string
+  remark?: string
+  duration?: string
+}
+
+export interface RetainSampleQuery extends PageQuery {
+  retainNo?: string
+  sampleCode?: string
+  sampleName?: string
+  retainStatus?: number
+  observationFlag?: number
+  createTimeStart?: string
+  createTimeEnd?: string
+}
+
+export interface RetainSampleCreateDTO {
+  id?: number
+  sampleId: number
+  sampleCode?: string
+  sampleName?: string
+  retainQuantity?: number
+  retainUnit?: string
+  retainReason?: string
+  retainDate?: string
+  expiryDate?: string
+  observationIntervalDays?: number
+  nextObservationDate?: string
+  storageLocation?: string
+  operatorId?: number
+  operatorName?: string
+  remark?: string
+}
+
+export interface RetainSampleOperateDTO {
+  id: number
+  operateType: number
+  operateQuantity?: number
+  operatorId?: number
+  operatorName?: string
+  operateTime?: string
+  receivePerson?: string
+  returnCondition?: string
+  targetLocation?: string
+  disposalMethod?: string
+  disposalReason?: string
+  remark?: string
+}
+
+export interface RetainSampleObservationDTO {
+  retainSampleId: number
+  observationDate?: string
+  observationContent: string
+  observationResult?: number
+  nextObservationDate?: string
+  observerId?: number
+  observerName?: string
+  remark?: string
+}
+
+export interface RetainSampleVO {
+  id: number
+  retainNo: string
+  sampleId: number
+  sampleCode: string
+  sampleName: string
+  matrix?: string
+  retainQuantity?: number
+  retainUnit?: string
+  currentQuantity?: number
+  retainReason?: string
+  retainDate?: string
+  expiryDate?: string
+  remainingDays?: number
+  observationIntervalDays?: number
+  lastObservationDate?: string
+  nextObservationDate?: string
+  storageLocation?: string
+  retainStatus?: number
+  retainStatusName?: string
+  observationFlag?: number
+  observationFlagName?: string
+  operatorName?: string
+  createTime?: string
+}
+
+export interface RetainSampleDetailVO extends RetainSampleVO {
+  operationLogs?: RetainSampleOperateLogVO[]
+  observationRecords?: RetainSampleObservationVO[]
+}
+
+export interface RetainSampleOperateLogVO {
+  id: number
+  retainSampleId: number
+  retainNo: string
+  operateType: number
+  operateTypeName: string
+  operateQuantity?: number
+  operateTime?: string
+  operatorName?: string
+  receivePerson?: string
+  returnCondition?: string
+  targetLocation?: string
+  disposalMethod?: string
+  remark?: string
+}
+
+export interface RetainSampleObservationVO {
+  id: number
+  retainSampleId: number
+  retainNo: string
+  observationDate?: string
+  observationContent: string
+  observationResult?: number
+  observationResultName?: string
+  nextObservationDate?: string
+  observerName?: string
+  remark?: string
+  createTime?: string
+}
+
+export interface SampleDisposalQuery extends PageQuery {
+  disposalNo?: string
+  sampleCode?: string
+  sampleName?: string
+  disposalStatus?: number
+  applicantId?: number
+  approvalStatus?: number
+  createTimeStart?: string
+  createTimeEnd?: string
+}
+
+export interface SampleDisposalApplyDTO {
+  id?: number
+  sampleIds: number[]
+  disposalReason: string
+  disposalMethod: number
+  expectedDisposalDate?: string
+  applicantId?: number
+  applicantName?: string
+  applyTime?: string
+  remark?: string
+}
+
+export interface SampleDisposalApprovalDTO {
+  id: number
+  approvalResult: number
+  approvalOpinion?: string
+  approverId?: number
+  approverName?: string
+  approvalTime?: string
+  approvalNode?: string
+}
+
+export interface SampleDisposalExecuteDTO {
+  id: number
+  actualDisposalDate?: string
+  disposalOperatorId?: number
+  disposalOperatorName?: string
+  disposalProcess?: string
+  witnessId?: number
+  witnessName?: string
+  disposalFile?: string
+  remark?: string
+}
+
+export interface SampleDisposalVO {
+  id: number
+  disposalNo: string
+  sampleCount?: number
+  disposalReason: string
+  disposalMethod: number
+  disposalMethodName?: string
+  expectedDisposalDate?: string
+  actualDisposalDate?: string
+  applicantId?: number
+  applicantName?: string
+  applyTime?: string
+  disposalStatus?: number
+  disposalStatusName?: string
+  approvalStatus?: number
+  approvalStatusName?: string
+  disposalOperatorName?: string
+  witnessName?: string
+  disposalFile?: string
+  remark?: string
+  createTime?: string
+}
+
+export interface SampleDisposalDetailVO extends SampleDisposalVO {
+  samples?: SampleVO[]
+  approvalRecords?: SampleDisposalApprovalVO[]
+}
+
+export interface SampleDisposalApprovalVO {
+  id: number
+  disposalId: number
+  disposalNo: string
+  approvalNode: string
+  approverId?: number
+  approverName?: string
+  approvalResult?: number
+  approvalResultName?: string
+  approvalOpinion?: string
+  approvalTime?: string
+}

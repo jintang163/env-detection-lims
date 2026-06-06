@@ -42,6 +42,42 @@ const routes: RouteRecordRaw[] = [
         name: 'Quotation',
         component: () => import('@/views/Quotation/index.vue'),
         meta: { title: '报价单管理', requiresAuth: true, icon: 'DollarOutlined' }
+      },
+      {
+        path: 'sample-register',
+        name: 'SampleRegister',
+        component: () => import('@/views/SampleRegister/index.vue'),
+        meta: { title: '样品登记', requiresAuth: true, icon: 'FormOutlined' }
+      },
+      {
+        path: 'sample-label',
+        name: 'SampleLabel',
+        component: () => import('@/views/SampleLabel/index.vue'),
+        meta: { title: '样品标识', requiresAuth: true, icon: 'QrcodeOutlined' }
+      },
+      {
+        path: 'sample-storage',
+        name: 'SampleStorage',
+        component: () => import('@/views/SampleStorage/index.vue'),
+        meta: { title: '样品存储', requiresAuth: true, icon: 'DatabaseOutlined' }
+      },
+      {
+        path: 'sample-transfer',
+        name: 'SampleTransferTrace',
+        component: () => import('@/views/SampleTransferTrace/index.vue'),
+        meta: { title: '样品流转跟踪', requiresAuth: true, icon: 'SwapOutlined' }
+      },
+      {
+        path: 'sample-retain',
+        name: 'SampleRetain',
+        component: () => import('@/views/SampleRetain/index.vue'),
+        meta: { title: '留样管理', requiresAuth: true, icon: 'SaveOutlined' }
+      },
+      {
+        path: 'sample-disposal',
+        name: 'SampleDisposal',
+        component: () => import('@/views/SampleDisposal/index.vue'),
+        meta: { title: '样品处置', requiresAuth: true, icon: 'DeleteOutlined' }
       }
     ]
   },
