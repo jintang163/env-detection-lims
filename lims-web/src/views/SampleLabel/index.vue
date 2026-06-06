@@ -193,13 +193,15 @@
                 <div class="code-title">
                   <QrcodeOutlined /> 二维码
                 </div>
-                <img :src="previewLabel.qrCodeUrl || mockQrCodeUrl" class="qr-code-img" />
+                <img v-if="previewLabel.qrCodeUrl" :src="previewLabel.qrCodeUrl" class="qr-code-img" />
+                <span v-else class="code-empty">暂无</span>
               </div>
               <div v-if="previewLabel.labelType === 2 || previewLabel.labelType === 3" class="code-item">
                 <div class="code-title">
                   <BarcodeOutlined /> 条形码
                 </div>
-                <img :src="previewLabel.barcodeUrl || mockBarcodeUrl" class="bar-code-img" />
+                <img v-if="previewLabel.barcodeUrl" :src="previewLabel.barcodeUrl" class="bar-code-img" />
+                <span v-else class="code-empty">暂无</span>
               </div>
             </div>
           </div>
@@ -290,9 +292,6 @@ const selectedRowKeys = ref<number[]>([])
 const selectedRows = ref<SampleLabelVO[]>([])
 const createTimeRange = ref<any[]>([])
 
-const mockQrCodeUrl = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0id2hpdGUiLz48ZyBmaWxsPSJibGFjayI+PHJlY3QgeD0iMTAiIHk9IjEwIiB3aWR0aD0iMjAiIGhlaWdodD0iMjAiLz48cmVjdCB4PSI3MCIgeT0iMTAiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIvPjxyZWN0IHg9IjEwIiB5PSI3MCIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIi8+PHJlY3QgeD0iMTUiIHk9IjE1IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iNzUiIHk9IjE1IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iMTUiIHk9Ijc1IiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IndoaXRlIi8+PHJlY3QgeD0iNDAiIHk9IjIwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNTAiIHk9IjIwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNDAiIHk9IjMwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNTAiIHk9IjMwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNDAiIHk9IjQwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNTAiIHk9IjQwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNDAiIHk9IjUwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNTAiIHk9IjUwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNDAiIHk9IjYwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNTAiIHk9IjYwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNjAiIHk9IjQwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNzAiIHk9IjQwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNjAiIHk9IjUwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PHJlY3QgeD0iNzAiIHk9IjUwIiB3aWR0aD0iNSIgaGVpZ2h0PSI1Ii8+PC9nPjwvc3ZnPg=='
-const mockBarcodeUrl = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgODAiPjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iODAiIGZpbGw9IndoaXRlIi8+PGcgZmlsbD0iYmxhY2siPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxNSIgeT0iMTAiIHdpZHRoPSI0IiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iMjIiIHk9IjEwIiB3aWR0aD0iMiIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjI3IiB5PSIxMCIgd2lkdGg9IjYiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIzNiIgeT0iMTAiIHdpZHRoPSIyIiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iNDEiIHk9IjEwIiB3aWR0aD0iNCIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjQ4IiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iNTAiLz48cmVjdCB4PSI1MyIgeT0iMTAiIHdpZHRoPSI2IiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iNjIiIHk9IjEwIiB3aWR0aD0iMiIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjY3IiB5PSIxMCIgd2lkdGg9IjQiIGhlaWdodD0iNTAiLz48cmVjdCB4PSI3NCIgeT0iMTAiIHdpZHRoPSIyIiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iNzkiIHk9IjEwIiB3aWR0aD0iNiIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9Ijg4IiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iNTAiLz48cmVjdCB4PSI5MyIgeT0iMTAiIHdpZHRoPSI0IiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iMTAwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxMDUiIHk9IjEwIiB3aWR0aD0iNiIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjExNCIgeT0iMTAiIHdpZHRoPSIyIiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iMTE5IiB5PSIxMCIgd2lkdGg9IjQiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxMjYiIHk9IjEwIiB3aWR0aD0iMiIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjEzMSIgeT0iMTAiIHdpZHRoPSI2IiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iMTQwIiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxNDUiIHk9IjEwIiB3aWR0aD0iNCIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjE1MiIgeT0iMTAiIHdpZHRoPSIyIiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iMTU3IiB5PSIxMCIgd2lkdGg9IjYiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxNjYiIHk9IjEwIiB3aWR0aD0iMiIgaGVpZ2h0PSI1MCIvPjxyZWN0IHg9IjE3MSIgeT0iMTAiIHdpZHRoPSI0IiBoZWlnaHQ9IjUwIi8+PHJlY3QgeD0iMTc4IiB5PSIxMCIgd2lkdGg9IjIiIGhlaWdodD0iNTAiLz48cmVjdCB4PSIxODMiIHk9IjEwIiB3aWR0aD0iNiIgaGVpZ2h0PSI1MCIvPjwvZz48dGV4dCB4PSIxMDAiIHk9Ijc1IiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTIiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9ImJsYWNrIj4xMjM0NTY3ODkwMTIzwd7w5DwvdGV4dD48L3N2Zz4='
-
 const queryParams = reactive<SampleLabelQuery>({
   pageNum: 1,
   pageSize: 10,
@@ -345,105 +344,6 @@ const printForm = reactive({
   printCount: 1
 })
 
-const mockLabels: SampleLabelVO[] = [
-  {
-    id: 1,
-    sampleId: 101,
-    sampleCode: 'YP202401001',
-    sampleName: '水质样本A',
-    labelType: 1,
-    labelTypeName: '二维码标签',
-    qrCode: 'QR-YP202401001-001',
-    barcode: 'BC-YP202401001-001',
-    qrCodeUrl: '',
-    barcodeUrl: '',
-    printStatus: 1,
-    printStatusName: '已打印',
-    printTime: '2024-01-15 10:30:00',
-    printCount: 2,
-    createTime: '2024-01-15 10:00:00'
-  },
-  {
-    id: 2,
-    sampleId: 102,
-    sampleCode: 'YP202401002',
-    sampleName: '土壤样本B',
-    labelType: 2,
-    labelTypeName: '条形码标签',
-    qrCode: 'QR-YP202401002-001',
-    barcode: 'BC-YP202401002-001',
-    qrCodeUrl: '',
-    barcodeUrl: '',
-    printStatus: 0,
-    printStatusName: '未打印',
-    printTime: '',
-    printCount: 0,
-    createTime: '2024-01-15 11:00:00'
-  },
-  {
-    id: 3,
-    sampleId: 103,
-    sampleCode: 'YP202401003',
-    sampleName: '空气样本C',
-    labelType: 3,
-    labelTypeName: '混合标签',
-    qrCode: 'QR-YP202401003-001',
-    barcode: 'BC-YP202401003-001',
-    qrCodeUrl: '',
-    barcodeUrl: '',
-    printStatus: 1,
-    printStatusName: '已打印',
-    printTime: '2024-01-15 14:20:00',
-    printCount: 3,
-    createTime: '2024-01-15 14:00:00'
-  },
-  {
-    id: 4,
-    sampleId: 104,
-    sampleCode: 'YP202401004',
-    sampleName: '水质样本D',
-    labelType: 1,
-    labelTypeName: '二维码标签',
-    qrCode: 'QR-YP202401004-001',
-    barcode: 'BC-YP202401004-001',
-    qrCodeUrl: '',
-    barcodeUrl: '',
-    printStatus: 0,
-    printStatusName: '未打印',
-    printTime: '',
-    printCount: 0,
-    createTime: '2024-01-16 09:00:00'
-  },
-  {
-    id: 5,
-    sampleId: 105,
-    sampleCode: 'YP202401005',
-    sampleName: '固体废弃物E',
-    labelType: 2,
-    labelTypeName: '条形码标签',
-    qrCode: 'QR-YP202401005-001',
-    barcode: 'BC-YP202401005-001',
-    qrCodeUrl: '',
-    barcodeUrl: '',
-    printStatus: 1,
-    printStatusName: '已打印',
-    printTime: '2024-01-16 10:15:00',
-    printCount: 1,
-    createTime: '2024-01-16 09:30:00'
-  }
-]
-
-const mockSamples: SampleVO[] = [
-  { id: 101, sampleCode: 'YP202401001', sampleName: '水质样本A' },
-  { id: 102, sampleCode: 'YP202401002', sampleName: '土壤样本B' },
-  { id: 103, sampleCode: 'YP202401003', sampleName: '空气样本C' },
-  { id: 104, sampleCode: 'YP202401004', sampleName: '水质样本D' },
-  { id: 105, sampleCode: 'YP202401005', sampleName: '固体废弃物E' },
-  { id: 106, sampleCode: 'YP202401006', sampleName: '噪声样本F' },
-  { id: 107, sampleCode: 'YP202401007', sampleName: '辐射样本G' },
-  { id: 108, sampleCode: 'YP202401008', sampleName: '生物样本H' }
-] as SampleVO[]
-
 const columns = [
   { title: '序号', dataIndex: 'index', key: 'index', width: 70 },
   { title: '样品编号', dataIndex: 'sampleCode', key: 'sampleCode', width: 140 },
@@ -465,24 +365,30 @@ const getLabelTypeColor = (type?: number) => {
 const fetchData = async () => {
   loading.value = true
   try {
-    const start = (pagination.value.current - 1) * pagination.value.pageSize
-    const end = start + pagination.value.pageSize
-    const filtered = mockLabels.filter(item => {
-      if (queryParams.sampleCode && !item.sampleCode.includes(queryParams.sampleCode)) return false
-      if (queryParams.sampleName && !item.sampleName.includes(queryParams.sampleName)) return false
-      if (queryParams.labelType !== undefined && item.labelType !== queryParams.labelType) return false
-      if (queryParams.printStatus !== undefined && item.printStatus !== queryParams.printStatus) return false
-      return true
-    })
-    tableData.value = filtered.slice(start, end).map((item, index) => ({ ...item, _index: index }))
-    pagination.value.total = filtered.length
+    const res = await getSampleLabelPage(queryParams)
+    tableData.value = res.data.list.map((item, index) => ({ ...item, _index: index }))
+    pagination.value.total = res.data.total
+    pagination.value.current = res.data.pageNum
+    pagination.value.pageSize = res.data.pageSize
+  } catch (error) {
+    console.error('Fetch label list error:', error)
+    message.error('获取标签列表失败')
+    tableData.value = []
+    pagination.value.total = 0
   } finally {
     loading.value = false
   }
 }
 
 const fetchSampleOptions = async () => {
-  sampleOptions.value = mockSamples
+  try {
+    const res = await getSampleList()
+    sampleOptions.value = res.data
+  } catch (error) {
+    console.error('Fetch sample list error:', error)
+    message.error('获取样品列表失败')
+    sampleOptions.value = []
+  }
 }
 
 const handleQuery = () => {
@@ -541,12 +447,13 @@ const handleGenerateSubmit = async () => {
   }
   submitting.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await generateLabel(generateForm.sampleIds, generateForm.labelType)
     message.success('标签生成成功')
     generateModalVisible.value = false
     fetchData()
   } catch (error) {
     console.error('Generate label error:', error)
+    message.error('标签生成失败')
   } finally {
     submitting.value = false
   }
@@ -638,12 +545,13 @@ const handlePrintSubmit = async () => {
       labelSize: printForm.labelSize,
       printCount: printForm.printCount
     }
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await printLabel(data)
     message.success('打印成功')
     printModalVisible.value = false
     fetchData()
   } catch (error) {
     console.error('Print error:', error)
+    message.error('打印失败')
   } finally {
     submitting.value = false
   }
@@ -651,11 +559,12 @@ const handlePrintSubmit = async () => {
 
 const handleReprint = async (record: SampleLabelVO) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+    await reprintLabel([record.id])
     message.success('重打成功')
     fetchData()
   } catch (error) {
     console.error('Reprint error:', error)
+    message.error('重打失败')
   }
 }
 

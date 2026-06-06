@@ -425,7 +425,10 @@ import {
   updateSample,
   deleteSample,
   generateSampleCode,
-  importSample
+  importSample,
+  getDictTestItemList,
+  getDictTestStandardList,
+  getDictItemStandardList
 } from '@/api/sample'
 
 const loading = ref(false)
@@ -468,37 +471,9 @@ const pagination = ref({
 const tableData = ref<SampleVO[]>([])
 const sampleDetail = ref<SampleDetailVO | null>(null)
 
-const dictTestItems = ref<DictTestItem[]>([
-  { id: 1, itemCode: 'pH001', itemName: 'pH值', itemCategory: '理化指标', unit: '无', standardPrice: 50, costPrice: 20, detectionLimit: 0.1, detectionCycle: 1 },
-  { id: 2, itemCode: 'COD001', itemName: '化学需氧量(COD)', itemCategory: '有机物', unit: 'mg/L', standardPrice: 100, costPrice: 50, detectionLimit: 5, detectionCycle: 2 },
-  { id: 3, itemCode: 'BOD001', itemName: '生化需氧量(BOD)', itemCategory: '有机物', unit: 'mg/L', standardPrice: 120, costPrice: 60, detectionLimit: 2, detectionCycle: 5 },
-  { id: 4, itemCode: 'NH3N001', itemName: '氨氮', itemCategory: '营养盐', unit: 'mg/L', standardPrice: 80, costPrice: 40, detectionLimit: 0.025, detectionCycle: 1 },
-  { id: 5, itemCode: 'TP001', itemName: '总磷', itemCategory: '营养盐', unit: 'mg/L', standardPrice: 80, costPrice: 40, detectionLimit: 0.01, detectionCycle: 1 },
-  { id: 6, itemCode: 'TN001', itemName: '总氮', itemCategory: '营养盐', unit: 'mg/L', standardPrice: 90, costPrice: 45, detectionLimit: 0.05, detectionCycle: 1 },
-  { id: 7, itemCode: 'SS001', itemName: '悬浮物', itemCategory: '理化指标', unit: 'mg/L', standardPrice: 60, costPrice: 30, detectionLimit: 4, detectionCycle: 1 },
-  { id: 8, itemCode: 'DO001', itemName: '溶解氧', itemCategory: '理化指标', unit: 'mg/L', standardPrice: 70, costPrice: 35, detectionLimit: 0.2, detectionCycle: 1 }
-])
-
-const dictTestStandards = ref<DictTestStandard[]>([
-  { id: 1, standardNo: 'GB 3838-2002', standardName: '地表水环境质量标准', standardType: '国家标准', issueDate: '2002-04-28', implementDate: '2002-06-01', issuingAuthority: '国家环境保护总局' },
-  { id: 2, standardNo: 'GB 5749-2022', standardName: '生活饮用水卫生标准', standardType: '国家标准', issueDate: '2022-03-15', implementDate: '2023-04-01', issuingAuthority: '国家市场监督管理总局' },
-  { id: 3, standardNo: 'GB 8978-1996', standardName: '污水综合排放标准', standardType: '国家标准', issueDate: '1996-08-01', implementDate: '1998-01-01', issuingAuthority: '国家环境保护局' },
-  { id: 4, standardNo: 'GB 15618-2018', standardName: '土壤环境质量 农用地土壤污染风险管控标准', standardType: '国家标准', issueDate: '2018-06-22', implementDate: '2018-08-01', issuingAuthority: '生态环境部' },
-  { id: 5, standardNo: 'GB 3095-2012', standardName: '环境空气质量标准', standardType: '国家标准', issueDate: '2012-02-29', implementDate: '2016-01-01', issuingAuthority: '环境保护部' }
-])
-
-const dictItemStandards = ref<DictItemStandard[]>([
-  { id: 1, itemId: 1, standardId: 1, limitValue: '6-9', remark: '' },
-  { id: 2, itemId: 1, standardId: 2, limitValue: '≥6.5且≤8.5', remark: '' },
-  { id: 3, itemId: 2, standardId: 1, limitValue: '≤20', remark: '' },
-  { id: 4, itemId: 2, standardId: 3, limitValue: '≤100', remark: '' },
-  { id: 5, itemId: 3, standardId: 1, limitValue: '≤4', remark: '' },
-  { id: 6, itemId: 4, standardId: 1, limitValue: '≤1.0', remark: '' },
-  { id: 7, itemId: 5, standardId: 1, limitValue: '≤0.2', remark: '' },
-  { id: 8, itemId: 6, standardId: 1, limitValue: '≤1.0', remark: '' },
-  { id: 9, itemId: 7, standardId: 1, limitValue: '≤25', remark: '' },
-  { id: 10, itemId: 8, standardId: 1, limitValue: '≥5', remark: '' }
-])
+const dictTestItems = ref<DictTestItem[]>([])
+const dictTestStandards = ref<DictTestStandard[]>([])
+const dictItemStandards = ref<DictItemStandard[]>([])
 
 const formData = reactive<SampleSaveDTO>({
   sampleCode: '',
@@ -517,14 +492,6 @@ const formData = reactive<SampleSaveDTO>({
   remark: '',
   items: []
 })
-
-const mockData: SampleVO[] = [
-  { id: 1, sampleCode: 'YP202401001', sampleName: '水样-A', pointId: 1, pointCode: 'P001', pointName: '进水口', samplingTime: '2024-01-15 09:30:00', matrix: '水质', matrixName: '水质', sampleQuantity: 2, sampleUnit: 'L', storageCondition: 2, storageConditionName: '冷藏(2-8℃)', preservative: '无', containerType: '聚乙烯瓶', samplerId: 1, samplerName: '张三', receiverId: 2, receiverName: '李四', receiveTime: '2024-01-15 14:00:00', sampleStatus: 2, sampleStatusName: '检测中', itemCount: 5, warningFlag: 0, createTime: '2024-01-15 10:00:00', createByName: '张三' },
-  { id: 2, sampleCode: 'YP202401002', sampleName: '水样-B', pointId: 2, pointCode: 'P002', pointName: '出水口', samplingTime: '2024-01-15 10:15:00', matrix: '水质', matrixName: '水质', sampleQuantity: 2, sampleUnit: 'L', storageCondition: 2, storageConditionName: '冷藏(2-8℃)', preservative: '无', containerType: '聚乙烯瓶', samplerId: 1, samplerName: '张三', receiverId: 2, receiverName: '李四', receiveTime: '2024-01-15 14:00:00', sampleStatus: 1, sampleStatusName: '待检测', itemCount: 3, warningFlag: 1, warningMessage: '保存条件异常', createTime: '2024-01-15 10:30:00', createByName: '张三' },
-  { id: 3, sampleCode: 'YP202401003', sampleName: '土壤样-1', pointId: 3, pointCode: 'P003', pointName: 'A区采样点', samplingTime: '2024-01-15 11:00:00', matrix: '土壤', matrixName: '土壤', sampleQuantity: 1, sampleUnit: 'kg', storageCondition: 1, storageConditionName: '常温', preservative: '无', containerType: '密封袋', samplerId: 3, samplerName: '王五', receiverId: 2, receiverName: '李四', receiveTime: '2024-01-15 15:00:00', sampleStatus: 3, sampleStatusName: '已完成', itemCount: 4, warningFlag: 0, createTime: '2024-01-15 11:30:00', createByName: '王五' },
-  { id: 4, sampleCode: 'YP202401004', sampleName: '大气样-1', pointId: 4, pointCode: 'P004', pointName: '厂界上风向', samplingTime: '2024-01-15 08:00:00', matrix: '大气', matrixName: '大气', sampleQuantity: 10, sampleUnit: 'm³', storageCondition: 4, storageConditionName: '避光', preservative: '无', containerType: '吸收瓶', samplerId: 3, samplerName: '王五', receiverId: 4, receiverName: '赵六', receiveTime: '2024-01-15 16:00:00', sampleStatus: 4, sampleStatusName: '已留样', itemCount: 2, warningFlag: 0, createTime: '2024-01-15 08:30:00', createByName: '王五' },
-  { id: 5, sampleCode: 'YP202401005', sampleName: '固废样-1', pointId: 5, pointCode: 'P005', pointName: '危废暂存区', samplingTime: '2024-01-16 09:00:00', matrix: '固体废物', matrixName: '固体废物', sampleQuantity: 500, sampleUnit: 'g', storageCondition: 1, storageConditionName: '常温', preservative: '无', containerType: '密封罐', samplerId: 1, samplerName: '张三', receiverId: 4, receiverName: '赵六', receiveTime: '2024-01-16 11:00:00', sampleStatus: 5, sampleStatusName: '已销毁', itemCount: 6, warningFlag: 0, createTime: '2024-01-16 09:30:00', createByName: '张三' }
-]
 
 const formRules = {
   sampleName: [{ required: true, message: '请输入样品名称', trigger: 'blur' }],
@@ -602,6 +569,22 @@ const getItemStandards = (itemId?: number) => {
   return dictTestStandards.value.filter((std: DictTestStandard) => standardIds.includes(std.id))
 }
 
+const fetchDictData = async () => {
+  try {
+    const [itemsRes, standardsRes, itemStandardsRes] = await Promise.all([
+      getDictTestItemList(),
+      getDictTestStandardList(),
+      getDictItemStandardList()
+    ])
+    dictTestItems.value = itemsRes.data
+    dictTestStandards.value = standardsRes.data
+    dictItemStandards.value = itemStandardsRes.data
+  } catch (error) {
+    console.error('Get dict data error:', error)
+    message.error('获取字典数据失败')
+  }
+}
+
 const fetchData = async () => {
   loading.value = true
   try {
@@ -612,8 +595,9 @@ const fetchData = async () => {
     pagination.value.total = res.data.total
   } catch (error) {
     console.error('Get sample page error:', error)
-    tableData.value = mockData.map((item, index) => ({ ...item, index }))
-    pagination.value.total = mockData.length
+    message.error('获取样品列表失败')
+    tableData.value = []
+    pagination.value.total = 0
   } finally {
     loading.value = false
   }
@@ -707,14 +691,8 @@ const handleView = async (record: SampleVO) => {
     sampleDetail.value = res.data
   } catch (error) {
     console.error('Get sample detail error:', error)
-    sampleDetail.value = {
-      ...mockData.find((m: SampleVO) => m.id === record.id)!,
-      items: [
-        { id: 1, sampleId: record.id, itemId: 1, itemCode: 'pH001', itemName: 'pH值', standardId: 1, standardNo: 'GB 3838-2002', standardName: '地表水环境质量标准', unit: '无', limitValue: '6-9', testResult: '7.2', testUnit: '无', resultStatus: 1, resultStatusName: '合格' },
-        { id: 2, sampleId: record.id, itemId: 2, itemCode: 'COD001', itemName: '化学需氧量(COD)', standardId: 1, standardNo: 'GB 3838-2002', standardName: '地表水环境质量标准', unit: 'mg/L', limitValue: '≤20', testResult: '15.6', testUnit: 'mg/L', resultStatus: 1, resultStatusName: '合格' },
-        { id: 3, sampleId: record.id, itemId: 4, itemCode: 'NH3N001', itemName: '氨氮', standardId: 1, standardNo: 'GB 3838-2002', standardName: '地表水环境质量标准', unit: 'mg/L', limitValue: '≤1.0', testResult: '0.85', testUnit: 'mg/L', resultStatus: 1, resultStatusName: '合格' }
-      ]
-    }
+    message.error('获取样品详情失败')
+    sampleDetail.value = null
   }
   detailTab.value = 'basic'
   detailModalVisible.value = true
@@ -751,8 +729,7 @@ const handleDelete = async (id: number) => {
     fetchData()
   } catch (error) {
     console.error('Delete error:', error)
-    message.success('删除成功')
-    fetchData()
+    message.error('删除失败')
   }
 }
 
@@ -767,8 +744,7 @@ const handleGenerateCode = async () => {
     message.success(`生成样品编号成功：${res.data[0]}`)
   } catch (error) {
     console.error('Generate code error:', error)
-    const code = `YP${dayjs().format('YYYYMM')}${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
-    message.success(`生成样品编号成功：${code}`)
+    message.error('生成样品编号失败')
   } finally {
     generatingCode.value = false
   }
@@ -781,7 +757,7 @@ const handleGenerateSingleCode = async () => {
     formData.sampleCode = res.data[0]
   } catch (error) {
     console.error('Generate single code error:', error)
-    formData.sampleCode = `YP${dayjs().format('YYYYMM')}${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`
+    message.error('生成样品编号失败')
   } finally {
     generatingCode.value = false
   }
@@ -812,8 +788,7 @@ const handleImport = async (options: any) => {
     fetchData()
   } catch (error) {
     console.error('Import error:', error)
-    message.success('导入成功：成功3条，失败0条')
-    fetchData()
+    message.error('导入失败')
   } finally {
     loading.value = false
   }
@@ -912,6 +887,7 @@ const handleRemoveItem = (index: number) => {
 }
 
 onMounted(() => {
+  fetchDictData()
   fetchData()
 })
 </script>

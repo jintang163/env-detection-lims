@@ -553,337 +553,6 @@ const autoCreateSampleIds = ref<number[]>([])
 
 const sampleList = ref<SampleVO[]>([])
 
-const mockSampleList: SampleVO[] = [
-  { id: 1, sampleCode: 'YP202401001', sampleName: '水样-地表水', matrix: '水体', matrixName: '水体', sampleQuantity: 1000, sampleUnit: 'ml', createTime: '2024-01-15 10:30:00' },
-  { id: 2, sampleCode: 'YP202401002', sampleName: '土壤样-农田', matrix: '土壤', matrixName: '土壤', sampleQuantity: 500, sampleUnit: 'g', createTime: '2024-01-16 14:20:00' },
-  { id: 3, sampleCode: 'YP202401003', sampleName: '大气样-PM2.5', matrix: '大气', matrixName: '大气', sampleQuantity: 50, sampleUnit: 'L', createTime: '2024-01-17 09:15:00' },
-  { id: 4, sampleCode: 'YP202401004', sampleName: '沉积物样', matrix: '沉积物', matrixName: '沉积物', sampleQuantity: 300, sampleUnit: 'g', createTime: '2024-01-18 16:45:00' },
-  { id: 5, sampleCode: 'YP202401005', sampleName: '生物样-鱼类', matrix: '生物', matrixName: '生物', sampleQuantity: 2, sampleUnit: '尾', createTime: '2024-01-19 11:00:00' },
-  { id: 6, sampleCode: 'YP202401006', sampleName: '固体废物样', matrix: '固废', matrixName: '固废', sampleQuantity: 200, sampleUnit: 'g', createTime: '2024-01-20 13:30:00' }
-]
-
-const mockData: RetainSampleVO[] = [
-  {
-    id: 1,
-    retainNo: 'LY202401001',
-    sampleId: 1,
-    sampleCode: 'YP202401001',
-    sampleName: '水样-地表水',
-    matrix: '水体',
-    retainQuantity: 500,
-    retainUnit: 'ml',
-    currentQuantity: 500,
-    retainReason: '常规留样',
-    retainDate: '2024-01-15',
-    expiryDate: '2025-01-15',
-    remainingDays: 223,
-    observationIntervalDays: 30,
-    lastObservationDate: '2024-05-15',
-    nextObservationDate: '2024-06-14',
-    storageLocation: '一号冷库-A区-01',
-    retainStatus: 1,
-    retainStatusName: '在库',
-    observationFlag: 1,
-    observationFlagName: '待观察',
-    operatorName: '张三',
-    createTime: '2024-01-15 10:30:00'
-  },
-  {
-    id: 2,
-    retainNo: 'LY202401002',
-    sampleId: 2,
-    sampleCode: 'YP202401002',
-    sampleName: '土壤样-农田',
-    matrix: '土壤',
-    retainQuantity: 200,
-    retainUnit: 'g',
-    currentQuantity: 100,
-    retainReason: '仲裁留样',
-    retainDate: '2024-01-16',
-    expiryDate: '2026-01-16',
-    remainingDays: 590,
-    observationIntervalDays: 60,
-    lastObservationDate: '2024-05-20',
-    nextObservationDate: '2024-07-19',
-    storageLocation: '二号冷库-B区-03',
-    retainStatus: 2,
-    retainStatusName: '领用中',
-    observationFlag: 2,
-    observationFlagName: '已观察',
-    operatorName: '李四',
-    createTime: '2024-01-16 14:20:00'
-  },
-  {
-    id: 3,
-    retainNo: 'LY202401003',
-    sampleId: 3,
-    sampleCode: 'YP202401003',
-    sampleName: '大气样-PM2.5',
-    matrix: '大气',
-    retainQuantity: 30,
-    retainUnit: 'L',
-    currentQuantity: 30,
-    retainReason: '常规留样',
-    retainDate: '2024-01-17',
-    expiryDate: '2024-07-17',
-    remainingDays: 41,
-    observationIntervalDays: 15,
-    lastObservationDate: '2024-06-01',
-    nextObservationDate: '2024-06-16',
-    storageLocation: '一号冷库-C区-02',
-    retainStatus: 3,
-    retainStatusName: '已归还',
-    observationFlag: 1,
-    observationFlagName: '待观察',
-    operatorName: '王五',
-    createTime: '2024-01-17 09:15:00'
-  },
-  {
-    id: 4,
-    retainNo: 'LY202401004',
-    sampleId: 4,
-    sampleCode: 'YP202401004',
-    sampleName: '沉积物样',
-    matrix: '沉积物',
-    retainQuantity: 150,
-    retainUnit: 'g',
-    currentQuantity: 0,
-    retainReason: '复检留样',
-    retainDate: '2023-06-01',
-    expiryDate: '2024-06-01',
-    remainingDays: 5,
-    observationIntervalDays: 0,
-    storageLocation: '已销毁',
-    retainStatus: 4,
-    retainStatusName: '已销毁',
-    observationFlag: 0,
-    observationFlagName: '无需观察',
-    operatorName: '赵六',
-    createTime: '2023-06-01 16:45:00'
-  },
-  {
-    id: 5,
-    retainNo: 'LY202401005',
-    sampleId: 5,
-    sampleCode: 'YP202401005',
-    sampleName: '生物样-鱼类',
-    matrix: '生物',
-    retainQuantity: 1,
-    retainUnit: '尾',
-    currentQuantity: 1,
-    retainReason: '专项留样',
-    retainDate: '2024-01-19',
-    expiryDate: '2024-12-19',
-    remainingDays: 196,
-    observationIntervalDays: 7,
-    lastObservationDate: '2024-06-03',
-    nextObservationDate: '2024-06-10',
-    storageLocation: '三号冷库-A区-05',
-    retainStatus: 1,
-    retainStatusName: '在库',
-    observationFlag: 1,
-    observationFlagName: '待观察',
-    operatorName: '张三',
-    createTime: '2024-01-19 11:00:00'
-  },
-  {
-    id: 6,
-    retainNo: 'LY202401006',
-    sampleId: 6,
-    sampleCode: 'YP202401006',
-    sampleName: '固体废物样',
-    matrix: '固废',
-    retainQuantity: 100,
-    retainUnit: 'g',
-    currentQuantity: 100,
-    retainReason: '常规留样',
-    retainDate: '2024-01-20',
-    expiryDate: '2025-01-20',
-    remainingDays: 228,
-    observationIntervalDays: 30,
-    lastObservationDate: '2024-05-20',
-    nextObservationDate: '2024-06-19',
-    storageLocation: '二号冷库-D区-01',
-    retainStatus: 1,
-    retainStatusName: '在库',
-    observationFlag: 0,
-    observationFlagName: '无需观察',
-    operatorName: '李四',
-    createTime: '2024-01-20 13:30:00'
-  }
-]
-
-const mockOperationLogs: RetainSampleOperateLogVO[] = [
-  {
-    id: 1,
-    retainSampleId: 2,
-    retainNo: 'LY202401002',
-    operateType: 1,
-    operateTypeName: '领用',
-    operateQuantity: 100,
-    operateTime: '2024-06-01 09:00:00',
-    operatorName: '李四',
-    receivePerson: '王检测',
-    remark: '用于复检实验'
-  },
-  {
-    id: 2,
-    retainSampleId: 3,
-    retainNo: 'LY202401003',
-    operateType: 1,
-    operateTypeName: '领用',
-    operateQuantity: 20,
-    operateTime: '2024-05-15 14:30:00',
-    operatorName: '王五',
-    receivePerson: '李实验',
-    remark: '用于对比实验'
-  },
-  {
-    id: 3,
-    retainSampleId: 3,
-    retainNo: 'LY202401003',
-    operateType: 2,
-    operateTypeName: '归还',
-    operateQuantity: 20,
-    operateTime: '2024-05-20 10:00:00',
-    operatorName: '王五',
-    returnCondition: '完好',
-    remark: '实验完成，样品完好归还'
-  },
-  {
-    id: 4,
-    retainSampleId: 1,
-    retainNo: 'LY202401001',
-    operateType: 3,
-    operateTypeName: '移库',
-    operateTime: '2024-04-10 11:00:00',
-    operatorName: '张三',
-    targetLocation: '一号冷库-A区-01',
-    remark: '原位置: 一号冷库-B区-02，因库位调整移库'
-  },
-  {
-    id: 5,
-    retainSampleId: 4,
-    retainNo: 'LY202401004',
-    operateType: 4,
-    operateTypeName: '销毁',
-    operateQuantity: 150,
-    operateTime: '2024-06-01 15:00:00',
-    operatorName: '赵六',
-    disposalMethod: '高温焚烧',
-    remark: '样品已过期，按规定销毁'
-  }
-]
-
-const mockObservationRecords: RetainSampleObservationVO[] = [
-  {
-    id: 1,
-    retainSampleId: 1,
-    retainNo: 'LY202401001',
-    observationDate: '2024-02-15',
-    observationContent: '检查样品外观、颜色、气味，均正常，无明显变化。容器密封良好，无渗漏。',
-    observationResult: 1,
-    observationResultName: '正常',
-    nextObservationDate: '2024-03-16',
-    observerName: '张三',
-    createTime: '2024-02-15 10:30:00'
-  },
-  {
-    id: 2,
-    retainSampleId: 1,
-    retainNo: 'LY202401001',
-    observationDate: '2024-03-16',
-    observationContent: '样品外观正常，颜色无变化，气味正常。冷藏温度稳定在4℃。',
-    observationResult: 1,
-    observationResultName: '正常',
-    nextObservationDate: '2024-04-15',
-    observerName: '李四',
-    createTime: '2024-03-16 14:00:00'
-  },
-  {
-    id: 3,
-    retainSampleId: 1,
-    retainNo: 'LY202401001',
-    observationDate: '2024-04-15',
-    observationContent: '样品状态良好，容器无破损，标签清晰。检查温度记录，期间温度波动正常。',
-    observationResult: 1,
-    observationResultName: '正常',
-    nextObservationDate: '2024-05-15',
-    observerName: '张三',
-    createTime: '2024-04-15 09:45:00'
-  },
-  {
-    id: 4,
-    retainSampleId: 1,
-    retainNo: 'LY202401001',
-    observationDate: '2024-05-15',
-    observationContent: '样品正常，无异常。建议下次观察时重点检查是否有沉淀产生。',
-    observationResult: 1,
-    observationResultName: '正常',
-    nextObservationDate: '2024-06-14',
-    observerName: '王五',
-    createTime: '2024-05-15 11:20:00'
-  },
-  {
-    id: 5,
-    retainSampleId: 5,
-    retainNo: 'LY202401005',
-    observationDate: '2024-05-27',
-    observationContent: '样品冷冻状态良好，包装完整。冷冻温度稳定在-20℃。',
-    observationResult: 1,
-    observationResultName: '正常',
-    nextObservationDate: '2024-06-03',
-    observerName: '赵六',
-    createTime: '2024-05-27 15:00:00'
-  },
-  {
-    id: 6,
-    retainSampleId: 5,
-    retainNo: 'LY202401005',
-    observationDate: '2024-06-03',
-    observationContent: '检查发现冷冻温度曾有短暂波动（-18℃），但很快恢复。样品外观无明显变化。',
-    observationResult: 2,
-    observationResultName: '轻微异常',
-    nextObservationDate: '2024-06-10',
-    observerName: '张三',
-    remark: '需密切关注下次观察结果，如有异常及时处理。',
-    createTime: '2024-06-03 10:15:00'
-  }
-]
-
-const mockDetailData: Record<number, RetainSampleDetailVO> = {
-  1: {
-    ...mockData[0],
-    operationLogs: [mockOperationLogs[3]],
-    observationRecords: [mockObservationRecords[0], mockObservationRecords[1], mockObservationRecords[2], mockObservationRecords[3]]
-  },
-  2: {
-    ...mockData[1],
-    operationLogs: [mockOperationLogs[0]],
-    observationRecords: []
-  },
-  3: {
-    ...mockData[2],
-    operationLogs: [mockOperationLogs[1], mockOperationLogs[2]],
-    observationRecords: []
-  },
-  4: {
-    ...mockData[3],
-    operationLogs: [mockOperationLogs[4]],
-    observationRecords: []
-  },
-  5: {
-    ...mockData[4],
-    operationLogs: [],
-    observationRecords: [mockObservationRecords[4], mockObservationRecords[5]]
-  },
-  6: {
-    ...mockData[5],
-    operationLogs: [],
-    observationRecords: []
-  }
-}
-
 const queryParams = reactive<RetainSampleQuery>({
   pageNum: 1,
   pageSize: 10,
@@ -998,9 +667,10 @@ const fetchData = async () => {
     const res = await getRetainSamplePage(queryParams)
     tableData.value = res.data.list
     pagination.value.total = res.data.total
-  } catch (error) {
-    tableData.value = mockData
-    pagination.value.total = mockData.length
+  } catch (error: any) {
+    tableData.value = []
+    pagination.value.total = 0
+    message.error(error?.message || '获取留样列表失败')
   } finally {
     loading.value = false
   }
@@ -1008,10 +678,11 @@ const fetchData = async () => {
 
 const fetchSampleList = async () => {
   try {
-    const res = await getSampleList()
+    const res = await getSampleList({ sampleStatus: 3 })
     sampleList.value = res.data
-  } catch (error) {
-    sampleList.value = mockSampleList
+  } catch (error: any) {
+    sampleList.value = []
+    message.error(error?.message || '获取样品列表失败')
   }
 }
 
@@ -1087,11 +758,9 @@ const handleCreateSubmit = async () => {
     message.success('留样创建成功')
     createModalVisible.value = false
     fetchData()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create error:', error)
-    message.success('留样创建成功')
-    createModalVisible.value = false
-    fetchData()
+    message.error(error?.message || '留样创建失败')
   } finally {
     submitting.value = false
   }
@@ -1113,11 +782,9 @@ const handleAutoCreateSubmit = async () => {
     message.success(`成功创建 ${autoCreateSampleIds.value.length} 条留样记录`)
     autoCreateModalVisible.value = false
     fetchData()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Auto create error:', error)
-    message.success(`成功创建 ${autoCreateSampleIds.value.length} 条留样记录`)
-    autoCreateModalVisible.value = false
-    fetchData()
+    message.error(error?.message || '自动创建留样失败')
   } finally {
     submitting.value = false
   }
@@ -1165,11 +832,9 @@ const handleOperateSubmit = async () => {
     message.success('操作成功')
     operateModalVisible.value = false
     fetchData()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Operate error:', error)
-    message.success('操作成功')
-    operateModalVisible.value = false
-    fetchData()
+    message.error(error?.message || '操作失败')
   } finally {
     submitting.value = false
   }
@@ -1192,15 +857,14 @@ const handleObservationSubmit = async () => {
   try {
     await observationFormRef.value.validate()
     submitting.value = true
+    observationFormData.nextObservationDate = dayjs(observationFormData.observationDate).add(retainDetail?.observationIntervalDays || 30, 'day').format('YYYY-MM-DD')
     await addObservationRecord(observationFormData)
     message.success('观察记录添加成功')
     observationModalVisible.value = false
     fetchData()
-  } catch (error) {
+  } catch (error: any) {
     console.error('Observation error:', error)
-    message.success('观察记录添加成功')
-    observationModalVisible.value = false
-    fetchData()
+    message.error(error?.message || '添加观察记录失败')
   } finally {
     submitting.value = false
   }
@@ -1210,8 +874,9 @@ const handleView = async (record: RetainSampleVO) => {
   try {
     const res = await getRetainSampleById(record.id)
     retainDetail.value = res.data
-  } catch (error) {
-    retainDetail.value = mockDetailData[record.id] || null
+  } catch (error: any) {
+    retainDetail.value = null
+    message.error(error?.message || '获取留样详情失败')
   }
   detailTab.value = 'basic'
   currentRetainId.value = record.id

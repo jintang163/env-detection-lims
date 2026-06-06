@@ -270,13 +270,15 @@ import type {
   SampleTransferLogVO,
   SampleTransferTimelineVO,
   SampleTransferTimelineItemVO,
-  SampleVO
+  SampleVO,
+  UserInfo
 } from '@/types'
 import {
   getSamplePage,
   getTransferTimeline,
   transferSample,
-  getTransferLogBySampleId
+  getTransferLogBySampleId,
+  getUserList
 } from '@/api/sample'
 
 const sampleLoading = ref(false)
@@ -303,291 +305,7 @@ const transferNodes = [
   { value: 7, label: '销毁' }
 ]
 
-const operatorList = [
-  { id: 1, name: '张三' },
-  { id: 2, name: '李四' },
-  { id: 3, name: '王五' },
-  { id: 4, name: '赵六' },
-  { id: 5, name: '钱七' }
-]
-
-const mockSamples: SampleVO[] = [
-  {
-    id: 1,
-    sampleCode: 'YP202401001',
-    sampleName: '水质样品-001',
-    pointName: '采样点A',
-    matrix: 'water',
-    matrixName: '水质',
-    sampleStatus: 2,
-    sampleStatusName: '检测中',
-    currentNode: 3,
-    currentNodeName: '前处理',
-    currentNodeStatus: 2,
-    entrustNo: 'WT202401001',
-    samplingTime: '2024-01-15 09:30:00',
-    sampleQuantity: 1000,
-    sampleUnit: 'ml',
-    createTime: '2024-01-15 10:00:00',
-    _index: 0
-  },
-  {
-    id: 2,
-    sampleCode: 'YP202401002',
-    sampleName: '土壤样品-002',
-    pointName: '采样点B',
-    matrix: 'soil',
-    matrixName: '土壤',
-    sampleStatus: 1,
-    sampleStatusName: '待检测',
-    currentNode: 1,
-    currentNodeName: '交接',
-    currentNodeStatus: 1,
-    entrustNo: 'WT202401001',
-    samplingTime: '2024-01-15 10:00:00',
-    sampleQuantity: 500,
-    sampleUnit: 'g',
-    createTime: '2024-01-15 10:30:00',
-    _index: 1
-  },
-  {
-    id: 3,
-    sampleCode: 'YP202401003',
-    sampleName: '大气样品-003',
-    pointName: '采样点C',
-    matrix: 'air',
-    matrixName: '大气',
-    sampleStatus: 3,
-    sampleStatusName: '已完成',
-    currentNode: 6,
-    currentNodeName: '留样',
-    currentNodeStatus: 1,
-    entrustNo: 'WT202401002',
-    samplingTime: '2024-01-14 14:00:00',
-    sampleQuantity: 10,
-    sampleUnit: 'L',
-    createTime: '2024-01-14 15:00:00',
-    _index: 2
-  },
-  {
-    id: 4,
-    sampleCode: 'YP202401004',
-    sampleName: '水质样品-004',
-    pointName: '采样点D',
-    matrix: 'water',
-    matrixName: '水质',
-    sampleStatus: 2,
-    sampleStatusName: '检测中',
-    currentNode: 4,
-    currentNodeName: '上机',
-    currentNodeStatus: 2,
-    entrustNo: 'WT202401002',
-    samplingTime: '2024-01-14 15:30:00',
-    sampleQuantity: 800,
-    sampleUnit: 'ml',
-    createTime: '2024-01-14 16:00:00',
-    _index: 3
-  },
-  {
-    id: 5,
-    sampleCode: 'YP202401005',
-    sampleName: '土壤样品-005',
-    pointName: '采样点E',
-    matrix: 'soil',
-    matrixName: '土壤',
-    sampleStatus: 2,
-    sampleStatusName: '检测中',
-    currentNode: 5,
-    currentNodeName: '审核',
-    currentNodeStatus: 2,
-    entrustNo: 'WT202401003',
-    samplingTime: '2024-01-13 09:00:00',
-    sampleQuantity: 600,
-    sampleUnit: 'g',
-    createTime: '2024-01-13 10:00:00',
-    _index: 4
-  },
-  {
-    id: 6,
-    sampleCode: 'YP202401006',
-    sampleName: '固废样品-006',
-    pointName: '采样点F',
-    matrix: 'solid',
-    matrixName: '固废',
-    sampleStatus: 1,
-    sampleStatusName: '待检测',
-    currentNode: 2,
-    currentNodeName: '制样',
-    currentNodeStatus: 2,
-    entrustNo: 'WT202401003',
-    samplingTime: '2024-01-16 08:30:00',
-    sampleQuantity: 2000,
-    sampleUnit: 'g',
-    createTime: '2024-01-16 09:00:00',
-    _index: 5
-  },
-  {
-    id: 7,
-    sampleCode: 'YP202401007',
-    sampleName: '水质样品-007',
-    pointName: '采样点G',
-    matrix: 'water',
-    matrixName: '水质',
-    sampleStatus: 4,
-    sampleStatusName: '已销毁',
-    currentNode: 7,
-    currentNodeName: '销毁',
-    currentNodeStatus: 1,
-    entrustNo: 'WT202401004',
-    samplingTime: '2024-01-10 11:00:00',
-    sampleQuantity: 500,
-    sampleUnit: 'ml',
-    createTime: '2024-01-10 12:00:00',
-    _index: 6
-  },
-  {
-    id: 8,
-    sampleCode: 'YP202401008',
-    sampleName: '大气样品-008',
-    pointName: '采样点H',
-    matrix: 'air',
-    matrixName: '大气',
-    sampleStatus: 1,
-    sampleStatusName: '待检测',
-    currentNode: 1,
-    currentNodeName: '交接',
-    currentNodeStatus: 2,
-    entrustNo: 'WT202401004',
-    samplingTime: '2024-01-16 14:00:00',
-    sampleQuantity: 20,
-    sampleUnit: 'L',
-    createTime: '2024-01-16 15:00:00',
-    _index: 7
-  }
-]
-
-const mockTimelines: Record<number, SampleTransferTimelineItemVO[]> = {
-  1: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '张三', operateTime: '2024-01-15 10:00:00', remark: '样品接收完好，数量核对无误', duration: '30分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 1, statusName: '已完成', operatorName: '李四', operateTime: '2024-01-15 14:30:00', remark: '制样完成，分装为2份', duration: '2小时' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 2, statusName: '进行中', operatorName: '王五', operateTime: '2024-01-16 09:00:00', remark: '正在进行消解处理', duration: '-' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ],
-  2: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '张三', operateTime: '2024-01-15 10:30:00', remark: '土壤样品，外观正常', duration: '20分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ],
-  3: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '李四', operateTime: '2024-01-14 15:00:00', remark: '气袋样品，密封良好', duration: '15分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 1, statusName: '已完成', operatorName: '王五', operateTime: '2024-01-14 16:00:00', remark: '无需制样，直接送检', duration: '10分钟' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 1, statusName: '已完成', operatorName: '赵六', operateTime: '2024-01-15 08:30:00', remark: '浓缩处理完成', duration: '3小时' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 1, statusName: '已完成', operatorName: '钱七', operateTime: '2024-01-15 14:00:00', remark: 'GC-MS检测完成', duration: '4小时' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 1, statusName: '已完成', operatorName: '张三', operateTime: '2024-01-16 09:00:00', remark: '数据审核通过，结果正常', duration: '1小时' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 1, statusName: '已完成', operatorName: '李四', operateTime: '2024-01-16 11:00:00', remark: '留样于冷藏柜A-01', duration: '30分钟' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ],
-  4: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '张三', operateTime: '2024-01-14 16:00:00', remark: '水质样品，冷藏保存', duration: '25分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 1, statusName: '已完成', operatorName: '李四', operateTime: '2024-01-15 08:00:00', remark: '过滤、酸化处理', duration: '1.5小时' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 1, statusName: '已完成', operatorName: '王五', operateTime: '2024-01-15 11:00:00', remark: '萃取完成', duration: '2.5小时' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 2, statusName: '进行中', operatorName: '赵六', operateTime: '2024-01-16 08:30:00', remark: 'HPLC检测中', duration: '-' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ],
-  5: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '李四', operateTime: '2024-01-13 10:00:00', remark: '土壤样品，编号清晰', duration: '20分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 1, statusName: '已完成', operatorName: '王五', operateTime: '2024-01-13 14:00:00', remark: '研磨、过筛完成', duration: '3小时' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 1, statusName: '已完成', operatorName: '赵六', operateTime: '2024-01-14 09:00:00', remark: '微波消解完成', duration: '4小时' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 1, statusName: '已完成', operatorName: '钱七', operateTime: '2024-01-15 08:00:00', remark: 'ICP检测完成', duration: '5小时' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 2, statusName: '进行中', operatorName: '张三', operateTime: '2024-01-16 09:30:00', remark: '数据审核中', duration: '-' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ],
-  6: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '张三', operateTime: '2024-01-16 09:00:00', remark: '固废样品，需特殊处理', duration: '30分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 2, statusName: '进行中', operatorName: '李四', operateTime: '2024-01-16 13:00:00', remark: '正在进行粉碎处理', duration: '-' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ],
-  7: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 1, statusName: '已完成', operatorName: '王五', operateTime: '2024-01-10 12:00:00', remark: '水质样品，已过保质期', duration: '15分钟' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 1, statusName: '已完成', operatorName: '赵六', operateTime: '2024-01-10 13:00:00', remark: '无需制样', duration: '5分钟' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 1, statusName: '已完成', operatorName: '钱七', operateTime: '2024-01-10 14:00:00', remark: '快速处理', duration: '1小时' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 1, statusName: '已完成', operatorName: '张三', operateTime: '2024-01-11 08:00:00', remark: '检测完成，数据异常', duration: '3小时' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 1, statusName: '已完成', operatorName: '李四', operateTime: '2024-01-11 14:00:00', remark: '审核不通过，样品过期', duration: '30分钟' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 1, statusName: '已完成', operatorName: '王五', operateTime: '2024-01-12 09:00:00', remark: '留样备查', duration: '20分钟' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 1, statusName: '已完成', operatorName: '赵六', operateTime: '2024-01-15 10:00:00', remark: '按危废处理流程销毁', duration: '2小时' }
-  ],
-  8: [
-    { nodeCode: '1', nodeName: '交接', nodeOrder: 1, status: 2, statusName: '进行中', operatorName: '张三', operateTime: '2024-01-16 15:00:00', remark: '正在核对样品信息', duration: '-' },
-    { nodeCode: '2', nodeName: '制样', nodeOrder: 2, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '3', nodeName: '前处理', nodeOrder: 3, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '4', nodeName: '上机', nodeOrder: 4, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '5', nodeName: '审核', nodeOrder: 5, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '6', nodeName: '留样', nodeOrder: 6, status: 3, statusName: '待处理', duration: '-' },
-    { nodeCode: '7', nodeName: '销毁', nodeOrder: 7, status: 3, statusName: '待处理', duration: '-' }
-  ]
-}
-
-const mockLogs: Record<number, SampleTransferLogVO[]> = {
-  1: [
-    { id: 1, sampleId: 1, sampleCode: 'YP202401001', sampleName: '水质样品-001', transferNode: 1, transferNodeName: '交接', operatorId: 1, operatorName: '张三', operateTime: '2024-01-15 10:00:00', remark: '样品接收完好，数量核对无误', duration: '30分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 },
-    { id: 2, sampleId: 1, sampleCode: 'YP202401001', sampleName: '水质样品-001', transferNode: 2, transferNodeName: '制样', operatorId: 2, operatorName: '李四', operateTime: '2024-01-15 14:30:00', remark: '制样完成，分装为2份', duration: '2小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 1 },
-    { id: 3, sampleId: 1, sampleCode: 'YP202401001', sampleName: '水质样品-001', transferNode: 3, transferNodeName: '前处理', operatorId: 3, operatorName: '王五', operateTime: '2024-01-16 09:00:00', remark: '正在进行消解处理', duration: '-', nodeStatus: 2, nodeStatusName: '进行中', _index: 2 }
-  ],
-  2: [
-    { id: 4, sampleId: 2, sampleCode: 'YP202401002', sampleName: '土壤样品-002', transferNode: 1, transferNodeName: '交接', operatorId: 1, operatorName: '张三', operateTime: '2024-01-15 10:30:00', remark: '土壤样品，外观正常', duration: '20分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 }
-  ],
-  3: [
-    { id: 5, sampleId: 3, sampleCode: 'YP202401003', sampleName: '大气样品-003', transferNode: 1, transferNodeName: '交接', operatorId: 2, operatorName: '李四', operateTime: '2024-01-14 15:00:00', remark: '气袋样品，密封良好', duration: '15分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 },
-    { id: 6, sampleId: 3, sampleCode: 'YP202401003', sampleName: '大气样品-003', transferNode: 2, transferNodeName: '制样', operatorId: 3, operatorName: '王五', operateTime: '2024-01-14 16:00:00', remark: '无需制样，直接送检', duration: '10分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 1 },
-    { id: 7, sampleId: 3, sampleCode: 'YP202401003', sampleName: '大气样品-003', transferNode: 3, transferNodeName: '前处理', operatorId: 4, operatorName: '赵六', operateTime: '2024-01-15 08:30:00', remark: '浓缩处理完成', duration: '3小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 2 },
-    { id: 8, sampleId: 3, sampleCode: 'YP202401003', sampleName: '大气样品-003', transferNode: 4, transferNodeName: '上机', operatorId: 5, operatorName: '钱七', operateTime: '2024-01-15 14:00:00', remark: 'GC-MS检测完成', duration: '4小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 3 },
-    { id: 9, sampleId: 3, sampleCode: 'YP202401003', sampleName: '大气样品-003', transferNode: 5, transferNodeName: '审核', operatorId: 1, operatorName: '张三', operateTime: '2024-01-16 09:00:00', remark: '数据审核通过，结果正常', duration: '1小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 4 },
-    { id: 10, sampleId: 3, sampleCode: 'YP202401003', sampleName: '大气样品-003', transferNode: 6, transferNodeName: '留样', operatorId: 2, operatorName: '李四', operateTime: '2024-01-16 11:00:00', remark: '留样于冷藏柜A-01', duration: '30分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 5 }
-  ],
-  4: [
-    { id: 11, sampleId: 4, sampleCode: 'YP202401004', sampleName: '水质样品-004', transferNode: 1, transferNodeName: '交接', operatorId: 1, operatorName: '张三', operateTime: '2024-01-14 16:00:00', remark: '水质样品，冷藏保存', duration: '25分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 },
-    { id: 12, sampleId: 4, sampleCode: 'YP202401004', sampleName: '水质样品-004', transferNode: 2, transferNodeName: '制样', operatorId: 2, operatorName: '李四', operateTime: '2024-01-15 08:00:00', remark: '过滤、酸化处理', duration: '1.5小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 1 },
-    { id: 13, sampleId: 4, sampleCode: 'YP202401004', sampleName: '水质样品-004', transferNode: 3, transferNodeName: '前处理', operatorId: 3, operatorName: '王五', operateTime: '2024-01-15 11:00:00', remark: '萃取完成', duration: '2.5小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 2 },
-    { id: 14, sampleId: 4, sampleCode: 'YP202401004', sampleName: '水质样品-004', transferNode: 4, transferNodeName: '上机', operatorId: 4, operatorName: '赵六', operateTime: '2024-01-16 08:30:00', remark: 'HPLC检测中', duration: '-', nodeStatus: 2, nodeStatusName: '进行中', _index: 3 }
-  ],
-  5: [
-    { id: 15, sampleId: 5, sampleCode: 'YP202401005', sampleName: '土壤样品-005', transferNode: 1, transferNodeName: '交接', operatorId: 2, operatorName: '李四', operateTime: '2024-01-13 10:00:00', remark: '土壤样品，编号清晰', duration: '20分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 },
-    { id: 16, sampleId: 5, sampleCode: 'YP202401005', sampleName: '土壤样品-005', transferNode: 2, transferNodeName: '制样', operatorId: 3, operatorName: '王五', operateTime: '2024-01-13 14:00:00', remark: '研磨、过筛完成', duration: '3小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 1 },
-    { id: 17, sampleId: 5, sampleCode: 'YP202401005', sampleName: '土壤样品-005', transferNode: 3, transferNodeName: '前处理', operatorId: 4, operatorName: '赵六', operateTime: '2024-01-14 09:00:00', remark: '微波消解完成', duration: '4小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 2 },
-    { id: 18, sampleId: 5, sampleCode: 'YP202401005', sampleName: '土壤样品-005', transferNode: 4, transferNodeName: '上机', operatorId: 5, operatorName: '钱七', operateTime: '2024-01-15 08:00:00', remark: 'ICP检测完成', duration: '5小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 3 },
-    { id: 19, sampleId: 5, sampleCode: 'YP202401005', sampleName: '土壤样品-005', transferNode: 5, transferNodeName: '审核', operatorId: 1, operatorName: '张三', operateTime: '2024-01-16 09:30:00', remark: '数据审核中', duration: '-', nodeStatus: 2, nodeStatusName: '进行中', _index: 4 }
-  ],
-  6: [
-    { id: 20, sampleId: 6, sampleCode: 'YP202401006', sampleName: '固废样品-006', transferNode: 1, transferNodeName: '交接', operatorId: 1, operatorName: '张三', operateTime: '2024-01-16 09:00:00', remark: '固废样品，需特殊处理', duration: '30分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 },
-    { id: 21, sampleId: 6, sampleCode: 'YP202401006', sampleName: '固废样品-006', transferNode: 2, transferNodeName: '制样', operatorId: 2, operatorName: '李四', operateTime: '2024-01-16 13:00:00', remark: '正在进行粉碎处理', duration: '-', nodeStatus: 2, nodeStatusName: '进行中', _index: 1 }
-  ],
-  7: [
-    { id: 22, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 1, transferNodeName: '交接', operatorId: 3, operatorName: '王五', operateTime: '2024-01-10 12:00:00', remark: '水质样品，已过保质期', duration: '15分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 0 },
-    { id: 23, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 2, transferNodeName: '制样', operatorId: 4, operatorName: '赵六', operateTime: '2024-01-10 13:00:00', remark: '无需制样', duration: '5分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 1 },
-    { id: 24, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 3, transferNodeName: '前处理', operatorId: 5, operatorName: '钱七', operateTime: '2024-01-10 14:00:00', remark: '快速处理', duration: '1小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 2 },
-    { id: 25, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 4, transferNodeName: '上机', operatorId: 1, operatorName: '张三', operateTime: '2024-01-11 08:00:00', remark: '检测完成，数据异常', duration: '3小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 3 },
-    { id: 26, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 5, transferNodeName: '审核', operatorId: 2, operatorName: '李四', operateTime: '2024-01-11 14:00:00', remark: '审核不通过，样品过期', duration: '30分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 4 },
-    { id: 27, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 6, transferNodeName: '留样', operatorId: 3, operatorName: '王五', operateTime: '2024-01-12 09:00:00', remark: '留样备查', duration: '20分钟', nodeStatus: 1, nodeStatusName: '已完成', _index: 5 },
-    { id: 28, sampleId: 7, sampleCode: 'YP202401007', sampleName: '水质样品-007', transferNode: 7, transferNodeName: '销毁', operatorId: 4, operatorName: '赵六', operateTime: '2024-01-15 10:00:00', remark: '按危废处理流程销毁', duration: '2小时', nodeStatus: 1, nodeStatusName: '已完成', _index: 6 }
-  ],
-  8: [
-    { id: 29, sampleId: 8, sampleCode: 'YP202401008', sampleName: '大气样品-008', transferNode: 1, transferNodeName: '交接', operatorId: 1, operatorName: '张三', operateTime: '2024-01-16 15:00:00', remark: '正在核对样品信息', duration: '-', nodeStatus: 2, nodeStatusName: '进行中', _index: 0 }
-  ]
-}
+const operatorList = ref<{ id: number; name: string }[]>([])
 
 const queryParams = reactive<SampleTransferQuery>({
   pageNum: 1,
@@ -605,7 +323,7 @@ const sampleList = ref<SampleVO[]>([])
 const samplePagination = ref({
   current: 1,
   pageSize: 10,
-  total: 8,
+  total: 0,
   showSizeChanger: true,
   showQuickJumper: true,
   showTotal: (total: number) => `共 ${total} 条记录`
@@ -709,25 +427,22 @@ const getSampleRowClassName = (record: SampleVO) => {
   return ''
 }
 
-const fetchSampleData = async () => {
+const fetchSampleList = async () => {
   sampleLoading.value = true
   try {
-    let filteredData = [...mockSamples]
-    
-    if (queryParams.sampleCode) {
-      filteredData = filteredData.filter(s => s.sampleCode.includes(queryParams.sampleCode!))
+    const res = await getSamplePage(queryParams)
+    if (res.code === 200 && res.data) {
+      sampleList.value = res.data.list.map((s, i) => ({ ...s, _index: i }))
+      samplePagination.value.total = res.data.total
+    } else {
+      sampleList.value = []
+      samplePagination.value.total = 0
+      message.error(res.message || '获取样品列表失败')
     }
-    if (queryParams.sampleName) {
-      filteredData = filteredData.filter(s => s.sampleName.includes(queryParams.sampleName!))
-    }
-    if (queryParams.transferNode) {
-      filteredData = filteredData.filter(s => s.currentNode === queryParams.transferNode)
-    }
-    
-    const start = (samplePagination.value.current - 1) * samplePagination.value.pageSize
-    const end = start + samplePagination.value.pageSize
-    sampleList.value = filteredData.slice(start, end).map((s, i) => ({ ...s, _index: i }))
-    samplePagination.value.total = filteredData.length
+  } catch (error: any) {
+    sampleList.value = []
+    samplePagination.value.total = 0
+    message.error(error.message || '获取样品列表失败')
   } finally {
     sampleLoading.value = false
   }
@@ -735,28 +450,52 @@ const fetchSampleData = async () => {
 
 const fetchTimelineData = async (sampleId: number) => {
   try {
-    const timeline = mockTimelines[sampleId] || []
-    timelineData.value = {
-      sampleId,
-      sampleCode: selectedSample.value?.sampleCode || '',
-      sampleName: selectedSample.value?.sampleName || '',
-      currentNode: selectedSample.value?.currentNode || 1,
-      currentNodeName: selectedSample.value?.currentNodeName || '',
-      timeline
+    const res = await getTransferTimeline(sampleId)
+    if (res.code === 200 && res.data) {
+      timelineData.value = res.data
+    } else {
+      timelineData.value = null
+      message.error(res.message || '获取流转时间线失败')
     }
-  } catch (error) {
-    console.error('Get timeline error:', error)
+  } catch (error: any) {
+    timelineData.value = null
+    message.error(error.message || '获取流转时间线失败')
   }
 }
 
-const fetchTransferLogData = async (sampleId: number) => {
+const fetchTransferLog = async (sampleId: number) => {
   logLoading.value = true
   try {
-    const logs = mockLogs[sampleId] || []
-    transferLogList.value = logs
-    logPagination.value.total = logs.length
+    const res = await getTransferLogBySampleId(sampleId)
+    if (res.code === 200 && res.data) {
+      transferLogList.value = res.data.map((l, i) => ({ ...l, _index: i }))
+      logPagination.value.total = res.data.length
+    } else {
+      transferLogList.value = []
+      logPagination.value.total = 0
+      message.error(res.message || '获取流转日志失败')
+    }
+  } catch (error: any) {
+    transferLogList.value = []
+    logPagination.value.total = 0
+    message.error(error.message || '获取流转日志失败')
   } finally {
     logLoading.value = false
+  }
+}
+
+const fetchOperators = async () => {
+  try {
+    const res = await getUserList()
+    if (res.code === 200 && res.data) {
+      operatorList.value = res.data.map((u: UserInfo) => ({ id: u.id, name: u.realName || u.username }))
+    } else {
+      operatorList.value = []
+      message.error(res.message || '获取操作人列表失败')
+    }
+  } catch (error: any) {
+    operatorList.value = []
+    message.error(error.message || '获取操作人列表失败')
   }
 }
 
@@ -767,7 +506,7 @@ const handleQuery = () => {
     queryParams.operateTimeStart = operateTimeRange.value[0]
     queryParams.operateTimeEnd = operateTimeRange.value[1]
   }
-  fetchSampleData()
+  fetchSampleList()
 }
 
 const handleReset = () => {
@@ -788,7 +527,7 @@ const handleSampleTableChange = (pag: any) => {
   queryParams.pageSize = pag.pageSize
   samplePagination.value.current = pag.current
   samplePagination.value.pageSize = pag.pageSize
-  fetchSampleData()
+  fetchSampleList()
 }
 
 const handleSampleClick = (record: SampleVO) => {
@@ -796,7 +535,7 @@ const handleSampleClick = (record: SampleVO) => {
   if (detailTab.value === 'timeline') {
     fetchTimelineData(record.id)
   } else {
-    fetchTransferLogData(record.id)
+    fetchTransferLog(record.id)
   }
 }
 
@@ -805,7 +544,7 @@ const handleDetailTabChange = (key: string) => {
   if (key === 'timeline') {
     fetchTimelineData(selectedSample.value.id)
   } else {
-    fetchTransferLogData(selectedSample.value.id)
+    fetchTransferLog(selectedSample.value.id)
   }
 }
 
@@ -834,25 +573,34 @@ const handleTransferSubmit = async () => {
   try {
     await transferFormRef.value.validate()
     submitting.value = true
-    message.success('流转操作成功')
-    transferModalVisible.value = false
-    fetchSampleData()
-    if (selectedSample.value) {
-      if (detailTab.value === 'timeline') {
-        fetchTimelineData(selectedSample.value.id)
-      } else {
-        fetchTransferLogData(selectedSample.value.id)
+    const res = await transferSample(transferFormData)
+    if (res.code === 200) {
+      message.success('流转操作成功')
+      transferModalVisible.value = false
+      fetchSampleList()
+      if (selectedSample.value) {
+        if (detailTab.value === 'timeline') {
+          fetchTimelineData(selectedSample.value.id)
+        } else {
+          fetchTransferLog(selectedSample.value.id)
+        }
       }
+    } else {
+      message.error(res.message || '流转操作失败')
     }
-  } catch (error) {
-    console.error('Transfer submit error:', error)
+  } catch (error: any) {
+    if (error.errorFields) {
+      return
+    }
+    message.error(error.message || '流转操作失败')
   } finally {
     submitting.value = false
   }
 }
 
 onMounted(() => {
-  fetchSampleData()
+  fetchSampleList()
+  fetchOperators()
 })
 </script>
 

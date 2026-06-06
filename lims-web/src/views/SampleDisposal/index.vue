@@ -341,7 +341,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
 import dayjs from 'dayjs'
 import {
@@ -420,143 +420,6 @@ const pagination = ref({
 
 const tableData = ref<SampleDisposalVO[]>([])
 const availableSamples = ref<SampleVO[]>([])
-
-const mockSamples: SampleVO[] = [
-  { id: 1, sampleCode: 'S2024001001', sampleName: '废水样品A', sampleStatus: 5, sampleStatusName: '检测完成', matrixName: '废水', warningFlag: 1, warningMessage: '已过期', createTime: '2024-01-15 10:30:00' },
-  { id: 2, sampleCode: 'S2024001002', sampleName: '废水样品B', sampleStatus: 5, sampleStatusName: '检测完成', matrixName: '废水', warningFlag: 0, createTime: '2024-01-15 10:35:00' },
-  { id: 3, sampleCode: 'S2024001003', sampleName: '土壤样品A', sampleStatus: 6, sampleStatusName: '已过期', matrixName: '土壤', warningFlag: 1, warningMessage: '已过期', createTime: '2024-01-10 14:20:00' },
-  { id: 4, sampleCode: 'S2024001004', sampleName: '大气样品A', sampleStatus: 5, sampleStatusName: '检测完成', matrixName: '大气', warningFlag: 0, createTime: '2024-01-12 09:15:00' },
-  { id: 5, sampleCode: 'S2024001005', sampleName: '固体废物A', sampleStatus: 6, sampleStatusName: '已过期', matrixName: '固体废物', warningFlag: 1, warningMessage: '已过期', createTime: '2024-01-08 16:45:00' },
-  { id: 6, sampleCode: 'S2024001006', sampleName: '废水样品C', sampleStatus: 5, sampleStatusName: '检测完成', matrixName: '废水', warningFlag: 0, createTime: '2024-01-18 11:00:00' },
-  { id: 7, sampleCode: 'S2024001007', sampleName: '土壤样品B', sampleStatus: 5, sampleStatusName: '检测完成', matrixName: '土壤', warningFlag: 0, createTime: '2024-01-20 13:30:00' },
-  { id: 8, sampleCode: 'S2024001008', sampleName: '大气样品B', sampleStatus: 6, sampleStatusName: '已过期', matrixName: '大气', warningFlag: 1, warningMessage: '已过期', createTime: '2024-01-05 08:00:00' }
-]
-
-const mockApprovalRecords: SampleDisposalApprovalVO[] = [
-  { id: 1, disposalId: 1, disposalNo: 'DIS202406001', approvalNode: '部门经理审批', approverName: '张三', approvalResult: 1, approvalResultName: '同意', approvalOpinion: '同意处置，按规范执行', approvalTime: '2024-06-02 10:30:00' },
-  { id: 2, disposalId: 1, disposalNo: 'DIS202406001', approvalNode: '质量负责人审批', approverName: '李四', approvalResult: 1, approvalResultName: '同意', approvalOpinion: '同意，注意环保要求', approvalTime: '2024-06-02 14:15:00' }
-]
-
-const mockData: SampleDisposalVO[] = [
-  {
-    id: 1,
-    disposalNo: 'DIS202406001',
-    sampleCount: 3,
-    disposalReason: '样品已过期，需按规范处置',
-    disposalMethod: 1,
-    disposalMethodName: '高温焚烧',
-    expectedDisposalDate: '2024-06-10',
-    actualDisposalDate: '2024-06-10',
-    applicantName: '王五',
-    applyTime: '2024-06-01 09:00:00',
-    disposalStatus: 5,
-    disposalStatusName: '已执行',
-    approvalStatus: 3,
-    approvalStatusName: '已通过',
-    disposalOperatorName: '赵六',
-    witnessName: '钱七',
-    disposalFile: '/files/disposal/DIS202406001.pdf',
-    createTime: '2024-06-01 09:00:00'
-  },
-  {
-    id: 2,
-    disposalNo: 'DIS202406002',
-    sampleCount: 2,
-    disposalReason: '检测完成，留样期满',
-    disposalMethod: 3,
-    disposalMethodName: '专业回收',
-    expectedDisposalDate: '2024-06-15',
-    applicantName: '王五',
-    applyTime: '2024-06-03 14:30:00',
-    disposalStatus: 3,
-    disposalStatusName: '已批准',
-    approvalStatus: 3,
-    approvalStatusName: '已通过',
-    createTime: '2024-06-03 14:30:00'
-  },
-  {
-    id: 3,
-    disposalNo: 'DIS202406003',
-    sampleCount: 5,
-    disposalReason: '样品性质不稳定，需提前处置',
-    disposalMethod: 2,
-    disposalMethodName: '化学处理',
-    expectedDisposalDate: '2024-06-12',
-    applicantName: '孙八',
-    applyTime: '2024-06-04 11:00:00',
-    disposalStatus: 2,
-    disposalStatusName: '审批中',
-    approvalStatus: 2,
-    approvalStatusName: '审批中',
-    createTime: '2024-06-04 11:00:00'
-  },
-  {
-    id: 4,
-    disposalNo: 'DIS202406004',
-    sampleCount: 2,
-    disposalReason: '检测结果异常，需销毁重新采样',
-    disposalMethod: 4,
-    disposalMethodName: '深埋处理',
-    expectedDisposalDate: '2024-06-08',
-    applicantName: '周九',
-    applyTime: '2024-06-02 16:20:00',
-    disposalStatus: 4,
-    disposalStatusName: '已驳回',
-    approvalStatus: 4,
-    approvalStatusName: '已驳回',
-    createTime: '2024-06-02 16:20:00'
-  },
-  {
-    id: 5,
-    disposalNo: 'DIS202406005',
-    sampleCount: 4,
-    disposalReason: '留样期满，按规定处置',
-    disposalMethod: 5,
-    disposalMethodName: '其他',
-    expectedDisposalDate: '2024-06-20',
-    applicantName: '吴十',
-    applyTime: '2024-06-05 08:45:00',
-    disposalStatus: 1,
-    disposalStatusName: '待审批',
-    approvalStatus: 1,
-    approvalStatusName: '待审批',
-    createTime: '2024-06-05 08:45:00'
-  }
-]
-
-const mockDetailMap: Record<number, SampleDisposalDetailVO> = {
-  1: {
-    ...mockData[0],
-    samples: mockSamples.slice(0, 3),
-    approvalRecords: mockApprovalRecords
-  },
-  2: {
-    ...mockData[1],
-    samples: mockSamples.slice(3, 5),
-    approvalRecords: [
-      { id: 3, disposalId: 2, disposalNo: 'DIS202406002', approvalNode: '部门经理审批', approverName: '张三', approvalResult: 1, approvalResultName: '同意', approvalOpinion: '同意回收', approvalTime: '2024-06-04 09:15:00' }
-    ]
-  },
-  3: {
-    ...mockData[2],
-    samples: mockSamples.slice(2, 7),
-    approvalRecords: [
-      { id: 4, disposalId: 3, disposalNo: 'DIS202406003', approvalNode: '部门经理审批', approverName: '张三', approvalResult: 1, approvalResultName: '同意', approvalTime: '2024-06-04 15:00:00' }
-    ]
-  },
-  4: {
-    ...mockData[3],
-    samples: mockSamples.slice(5, 7),
-    approvalRecords: [
-      { id: 5, disposalId: 4, disposalNo: 'DIS202406004', approvalNode: '部门经理审批', approverName: '张三', approvalResult: 2, approvalResultName: '驳回', approvalOpinion: '异常样品需先进行复检，确认后再处置', approvalTime: '2024-06-03 10:30:00' }
-    ]
-  },
-  5: {
-    ...mockData[4],
-    samples: mockSamples.slice(1, 5),
-    approvalRecords: []
-  }
-}
 
 const applyFormData = reactive<SampleDisposalApplyDTO>({
   sampleIds: [],
@@ -641,17 +504,19 @@ const sampleDetailColumns = [
 const fetchData = async () => {
   loading.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    const filteredData = mockData.filter(item => {
-      if (queryParams.disposalNo && !item.disposalNo.includes(queryParams.disposalNo)) return false
-      if (queryParams.disposalStatus !== undefined && item.disposalStatus !== queryParams.disposalStatus) return false
-      if (queryParams.approvalStatus !== undefined && item.approvalStatus !== queryParams.approvalStatus) return false
-      return true
-    })
-    const start = (queryParams.pageNum! - 1) * queryParams.pageSize!
-    const end = start + queryParams.pageSize!
-    tableData.value = filteredData.slice(start, end)
-    pagination.value.total = filteredData.length
+    const res = await getSampleDisposalPage(queryParams)
+    if (res.code === 200) {
+      tableData.value = res.data.records
+      pagination.value.total = res.data.total
+    } else {
+      message.error(res.msg || '获取数据失败')
+      tableData.value = []
+      pagination.value.total = 0
+    }
+  } catch (error: any) {
+    message.error(error.message || '获取数据失败')
+    tableData.value = []
+    pagination.value.total = 0
   } finally {
     loading.value = false
   }
@@ -660,8 +525,16 @@ const fetchData = async () => {
 const fetchAvailableSamples = async () => {
   sampleLoading.value = true
   try {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    availableSamples.value = mockSamples.filter(s => s.sampleStatus === 5 || s.sampleStatus === 6)
+    const res = await getSampleList({ disposalAvailable: true })
+    if (res.code === 200) {
+      availableSamples.value = res.data
+    } else {
+      message.error(res.msg || '获取可处置样品列表失败')
+      availableSamples.value = []
+    }
+  } catch (error: any) {
+    message.error(error.message || '获取可处置样品列表失败')
+    availableSamples.value = []
   } finally {
     sampleLoading.value = false
   }
@@ -724,12 +597,16 @@ const handleApplySubmit = async () => {
     applyFormData.sampleIds = selectedSampleIds.value
     await applyFormRef.value.validate()
     submitting.value = true
-    await new Promise(resolve => setTimeout(resolve, 800))
-    message.success('处置申请提交成功')
-    applyModalVisible.value = false
-    fetchData()
-  } catch (error) {
-    console.error('Apply error:', error)
+    const res = await applyDisposal(applyFormData)
+    if (res.code === 200) {
+      message.success('处置申请提交成功')
+      applyModalVisible.value = false
+      fetchData()
+    } else {
+      message.error(res.msg || '提交失败')
+    }
+  } catch (error: any) {
+    message.error(error.message || '提交失败')
   } finally {
     submitting.value = false
   }
@@ -737,37 +614,54 @@ const handleApplySubmit = async () => {
 
 const handleView = async (record: SampleDisposalVO) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 300))
-    currentDetail.value = mockDetailMap[record.id]
-    detailTab.value = 'basic'
-    detailModalVisible.value = true
-  } catch (error) {
-    console.error('Get detail error:', error)
+    const res = await getSampleDisposalById(record.id)
+    if (res.code === 200) {
+      currentDetail.value = res.data
+      detailTab.value = 'basic'
+      detailModalVisible.value = true
+    } else {
+      message.error(res.msg || '获取详情失败')
+    }
+  } catch (error: any) {
+    message.error(error.message || '获取详情失败')
   }
 }
 
-const handleApproval = (record: SampleDisposalVO) => {
-  currentDisposalId.value = record.id
-  currentDetail.value = mockDetailMap[record.id]
-  Object.assign(approvalFormData, {
-    id: record.id,
-    approvalResult: 1,
-    approvalOpinion: '',
-    approvalNode: ''
-  })
-  approvalModalVisible.value = true
+const handleApproval = async (record: SampleDisposalVO) => {
+  try {
+    currentDisposalId.value = record.id
+    const res = await getSampleDisposalById(record.id)
+    if (res.code === 200) {
+      currentDetail.value = res.data
+      Object.assign(approvalFormData, {
+        id: record.id,
+        approvalResult: 1,
+        approvalOpinion: '',
+        approvalNode: ''
+      })
+      approvalModalVisible.value = true
+    } else {
+      message.error(res.msg || '获取详情失败')
+    }
+  } catch (error: any) {
+    message.error(error.message || '获取详情失败')
+  }
 }
 
 const handleApprovalSubmit = async () => {
   try {
     await approvalFormRef.value.validate()
     submitting.value = true
-    await new Promise(resolve => setTimeout(resolve, 800))
-    message.success(approvalFormData.approvalResult === 1 ? '审批通过' : '已驳回')
-    approvalModalVisible.value = false
-    fetchData()
-  } catch (error) {
-    console.error('Approval error:', error)
+    const res = await approvalDisposal(approvalFormData)
+    if (res.code === 200) {
+      message.success(approvalFormData.approvalResult === 1 ? '审批通过' : '已驳回')
+      approvalModalVisible.value = false
+      fetchData()
+    } else {
+      message.error(res.msg || '审批失败')
+    }
+  } catch (error: any) {
+    message.error(error.message || '审批失败')
   } finally {
     submitting.value = false
   }
@@ -792,12 +686,16 @@ const handleExecuteSubmit = async () => {
   try {
     await executeFormRef.value.validate()
     submitting.value = true
-    await new Promise(resolve => setTimeout(resolve, 800))
-    message.success('处置执行成功')
-    executeModalVisible.value = false
-    fetchData()
-  } catch (error) {
-    console.error('Execute error:', error)
+    const res = await executeDisposal(executeFormData)
+    if (res.code === 200) {
+      message.success('处置执行成功')
+      executeModalVisible.value = false
+      fetchData()
+    } else {
+      message.error(res.msg || '执行失败')
+    }
+  } catch (error: any) {
+    message.error(error.message || '执行失败')
   } finally {
     submitting.value = false
   }
@@ -805,11 +703,15 @@ const handleExecuteSubmit = async () => {
 
 const handleCancel = async (id: number) => {
   try {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    message.success('取消成功')
-    fetchData()
-  } catch (error) {
-    console.error('Cancel error:', error)
+    const res = await cancelDisposal(id)
+    if (res.code === 200) {
+      message.success('取消成功')
+      fetchData()
+    } else {
+      message.error(res.msg || '取消失败')
+    }
+  } catch (error: any) {
+    message.error(error.message || '取消失败')
   }
 }
 

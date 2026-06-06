@@ -715,7 +715,8 @@ import {
   sampleOutbound,
   moveSampleStorage,
   getStorageLogBySampleId,
-  getSampleList
+  getSampleList,
+  getSampleStorageLogPage
 } from '@/api/sample'
 
 const loading = ref(false)
@@ -984,16 +985,6 @@ const storageCells = computed(() => {
   })
 
   locationMap.forEach(cell => cells.push(cell))
-  if (cells.length === 0) {
-    for (let i = 1; i <= 12; i++) {
-      cells.push({
-        locationCode: `A-${String(i).padStart(2, '0')}`,
-        sampleCount: 0,
-        warningCount: 0,
-        samples: []
-      })
-    }
-  }
   return cells
 })
 
@@ -1043,8 +1034,9 @@ const fetchStorageTree = async () => {
   try {
     const res = await getStorageTree()
     storageTree.value = res.data || []
-  } catch (error) {
-    console.error('Get storage tree error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '获取存储树失败')
+    storageTree.value = []
   }
 }
 
@@ -1052,8 +1044,9 @@ const fetchWarehouseList = async () => {
   try {
     const res = await getWarehouseList({ status: 1 })
     warehouseList.value = res.data || []
-  } catch (error) {
-    console.error('Get warehouse list error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '获取库房列表失败')
+    warehouseList.value = []
   }
 }
 
@@ -1061,8 +1054,9 @@ const fetchRefrigeratorList = async () => {
   try {
     const res = await getRefrigeratorList()
     refrigeratorList.value = res.data || []
-  } catch (error) {
-    console.error('Get refrigerator list error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '获取冰箱列表失败')
+    refrigeratorList.value = []
   }
 }
 
@@ -1070,8 +1064,9 @@ const fetchShelfList = async () => {
   try {
     const res = await getShelfList({ status: 1 })
     shelfList.value = res.data || []
-  } catch (error) {
-    console.error('Get shelf list error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '获取货架列表失败')
+    shelfList.value = []
   }
 }
 
@@ -1079,8 +1074,9 @@ const fetchAvailableSamples = async () => {
   try {
     const res = await getSampleList({ sampleStatus: 1 })
     availableSampleList.value = res.data || []
-  } catch (error) {
-    console.error('Get available samples error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '获取可用样品列表失败')
+    availableSampleList.value = []
   }
 }
 
@@ -1098,8 +1094,12 @@ const fetchStorageData = async () => {
       }
     }
     const res = await getSampleStoragePage(params)
-    storageTableData.value = res.data.list
-    storagePagination.value.total = res.data.total
+    storageTableData.value = res.data.list || []
+    storagePagination.value.total = res.data.total || 0
+  } catch (error: any) {
+    message.error(error?.message || '获取存储数据失败')
+    storageTableData.value = []
+    storagePagination.value.total = 0
   } finally {
     storageLoading.value = false
   }
@@ -1119,7 +1119,7 @@ const fetchWarningData = async () => {
       }
     }
     const res = await getSampleStoragePage(params)
-    let data = res.data.list
+    let data = res.data.list || []
     if (warningTypeFilter.value) {
       data = data.filter(item => {
         const msg = item.warningMessage || ''
@@ -1130,7 +1130,11 @@ const fetchWarningData = async () => {
       })
     }
     warningTableData.value = data
-    warningPagination.value.total = res.data.total
+    warningPagination.value.total = res.data.total || 0
+  } catch (error: any) {
+    message.error(error?.message || '获取预警数据失败')
+    warningTableData.value = []
+    warningPagination.value.total = 0
   } finally {
     warningLoading.value = false
   }
@@ -1147,36 +1151,22 @@ const fetchLogData = async () => {
       params.operateTimeStart = logTimeRange.value[0]
       params.operateTimeEnd = logTimeRange.value[1]
     }
-    const res = await getSampleStoragePage({
-      ...queryParams,
-      pageNum: 1,
-      pageSize: 1000
-    })
-    const allLogs: SampleStorageLogVO[] = []
-    res.data.list.forEach(item => {
-      if (item.id) {
-        allLogs.push({
-          id: item.id,
-          sampleId: item.sampleId,
-          sampleCode: item.sampleCode,
-          sampleName: item.sampleName,
-          operateType: item.storageStatus === 1 ? 1 : item.storageStatus === 3 ? 2 : 3,
-          operateTypeName: item.storageStatus === 1 ? '入库' : item.storageStatus === 3 ? '出库' : '移动',
-          warehouseId: item.warehouseId,
-          warehouseName: item.warehouseName,
-          refrigeratorId: item.refrigeratorId,
-          refrigeratorName: item.refrigeratorName,
-          shelfId: item.shelfId,
-          shelfName: item.shelfName,
-          locationCode: item.locationCode,
-          operateTime: item.storageTime,
-          operatorName: item.storageOperatorName,
-          remark: item.warningMessage
-        })
+    if (currentTreeNode.value) {
+      if (currentTreeNode.value.type === 'warehouse') {
+        params.warehouseId = currentTreeNode.value.id
+      } else if (currentTreeNode.value.type === 'refrigerator') {
+        params.refrigeratorId = currentTreeNode.value.id
+      } else if (currentTreeNode.value.type === 'shelf') {
+        params.shelfId = currentTreeNode.value.id
       }
-    })
-    logTableData.value = allLogs
-    logPagination.value.total = allLogs.length
+    }
+    const res = await getSampleStorageLogPage(params)
+    logTableData.value = res.data.list || []
+    logPagination.value.total = res.data.total || 0
+  } catch (error: any) {
+    message.error(error?.message || '获取存储日志失败')
+    logTableData.value = []
+    logPagination.value.total = 0
   } finally {
     logLoading.value = false
   }
@@ -1187,6 +1177,9 @@ const fetchSampleLog = async (sampleId: number) => {
   try {
     const res = await getStorageLogBySampleId(sampleId)
     sampleLogData.value = res.data || []
+  } catch (error: any) {
+    message.error(error?.message || '获取样品日志失败')
+    sampleLogData.value = []
   } finally {
     sampleLogLoading.value = false
   }
@@ -1371,8 +1364,8 @@ const handleWarehouseSubmit = async () => {
     warehouseModalVisible.value = false
     fetchStorageTree()
     fetchWarehouseList()
-  } catch (error) {
-    console.error('Warehouse submit error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '操作失败')
   } finally {
     submitting.value = false
   }
@@ -1384,8 +1377,8 @@ const handleDeleteWarehouse = async (id: number) => {
     message.success('删除成功')
     fetchStorageTree()
     fetchWarehouseList()
-  } catch (error) {
-    console.error('Delete warehouse error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '删除失败')
   }
 }
 
@@ -1437,8 +1430,8 @@ const handleRefrigeratorSubmit = async () => {
     refrigeratorModalVisible.value = false
     fetchStorageTree()
     fetchRefrigeratorList()
-  } catch (error) {
-    console.error('Refrigerator submit error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '操作失败')
   } finally {
     submitting.value = false
   }
@@ -1450,8 +1443,8 @@ const handleDeleteRefrigerator = async (id: number) => {
     message.success('删除成功')
     fetchStorageTree()
     fetchRefrigeratorList()
-  } catch (error) {
-    console.error('Delete refrigerator error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '删除失败')
   }
 }
 
@@ -1521,8 +1514,8 @@ const handleShelfSubmit = async () => {
     shelfModalVisible.value = false
     fetchStorageTree()
     fetchShelfList()
-  } catch (error) {
-    console.error('Shelf submit error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '操作失败')
   } finally {
     submitting.value = false
   }
@@ -1534,8 +1527,8 @@ const handleDeleteShelf = async (id: number) => {
     message.success('删除成功')
     fetchStorageTree()
     fetchShelfList()
-  } catch (error) {
-    console.error('Delete shelf error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '删除失败')
   }
 }
 
@@ -1568,8 +1561,8 @@ const handleInboundSubmit = async () => {
     inboundModalVisible.value = false
     fetchStorageData()
     fetchStorageTree()
-  } catch (error) {
-    console.error('Inbound submit error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '入库失败')
   } finally {
     submitting.value = false
   }
@@ -1608,8 +1601,8 @@ const handleOutboundSubmit = async () => {
     outboundModalVisible.value = false
     fetchStorageData()
     fetchStorageTree()
-  } catch (error) {
-    console.error('Outbound submit error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '出库失败')
   } finally {
     submitting.value = false
   }
@@ -1642,8 +1635,8 @@ const handleMoveSubmit = async () => {
     moveModalVisible.value = false
     fetchStorageData()
     fetchStorageTree()
-  } catch (error) {
-    console.error('Move submit error:', error)
+  } catch (error: any) {
+    message.error(error?.message || '移动失败')
   } finally {
     submitting.value = false
   }
@@ -1693,8 +1686,8 @@ const handleDrop = async (e: DragEvent, targetLocation: string) => {
       })
       message.success('移动成功')
       fetchStorageData()
-    } catch (error) {
-      console.error('Drag move error:', error)
+    } catch (error: any) {
+      message.error(error?.message || '移动失败')
     }
   }
   dragSample.value = null

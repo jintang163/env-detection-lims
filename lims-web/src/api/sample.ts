@@ -36,8 +36,12 @@ import type {
   SampleDisposalExecuteDTO,
   SampleDisposalVO,
   SampleDisposalDetailVO,
+  DictTestItem,
+  DictTestStandard,
+  DictItemStandard,
   PageResult,
-  Result
+  Result,
+  UserInfo
 } from '@/types'
 
 export function getSamplePage(params: SampleQuery) {
@@ -198,6 +202,10 @@ export function getTransferLogBySampleId(sampleId: number) {
   return get<Result<SampleTransferLogVO[]>>(`/sample/transfer/log/${sampleId}`)
 }
 
+export function getUserList(params?: any) {
+  return get<Result<UserInfo[]>>('/system/user/list', params)
+}
+
 export function getRetainSamplePage(params: RetainSampleQuery) {
   return get<Result<PageResult<RetainSampleVO>>>('/sample/retain/page', params)
 }
@@ -252,4 +260,20 @@ export function cancelDisposal(id: number) {
 
 export function getDisposalApprovalRecords(disposalId: number) {
   return get<Result<any[]>>(`/sample/disposal/approval/${disposalId}`)
+}
+
+export function getDictTestItemList(params?: any) {
+  return get<Result<DictTestItem[]>>('/dict/testItem/list', params)
+}
+
+export function getDictTestStandardList(params?: any) {
+  return get<Result<DictTestStandard[]>>('/dict/testStandard/list', params)
+}
+
+export function getDictItemStandardList(params?: any) {
+  return get<Result<DictItemStandard[]>>('/dict/itemStandard/list', params)
+}
+
+export function getSampleStorageLogPage(params: any) {
+  return get<Result<PageResult<SampleStorageLogVO>>>('/sample/storage/log/page', params)
 }
