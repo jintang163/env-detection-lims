@@ -52,6 +52,30 @@ const routes = [
     name: 'OosRecordEdit',
     component: () => import('@/views/detection/OosRecordEdit.vue'),
     meta: { title: 'OOS详情' }
+  },
+  {
+    path: '/detection/quality/rule',
+    name: 'QualityControlRule',
+    component: () => import('@/views/detection/QualityControlRule.vue'),
+    meta: { title: '质控规则配置' }
+  },
+  {
+    path: '/detection/quality/sample',
+    name: 'QualityControlSample',
+    component: () => import('@/views/detection/QualityControlSample.vue'),
+    meta: { title: '质控样品管理' }
+  },
+  {
+    path: '/detection/quality/plan',
+    name: 'QualityControlPlan',
+    component: () => import('@/views/detection/QualityControlPlan.vue'),
+    meta: { title: '质控计划' }
+  },
+  {
+    path: '/detection/quality/chart',
+    name: 'QualityControlChart',
+    component: () => import('@/views/detection/QualityControlChart.vue'),
+    meta: { title: '质控图分析' }
   }
 ]
 

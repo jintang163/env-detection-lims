@@ -49,6 +49,28 @@
             <el-icon><Warning /></el-icon>
             <span>超标预警(OOS)</span>
           </el-menu-item>
+          <el-sub-menu index="quality">
+            <template #title>
+              <el-icon><DataAnalysis /></el-icon>
+              <span>质量与质控管理</span>
+            </template>
+            <el-menu-item index="/detection/quality/rule">
+              <el-icon><Setting /></el-icon>
+              <span>质控规则配置</span>
+            </el-menu-item>
+            <el-menu-item index="/detection/quality/sample">
+              <el-icon><Box /></el-icon>
+              <span>质控样品管理</span>
+            </el-menu-item>
+            <el-menu-item index="/detection/quality/plan">
+              <el-icon><Calendar /></el-icon>
+              <span>质控计划</span>
+            </el-menu-item>
+            <el-menu-item index="/detection/quality/chart">
+              <el-icon><TrendCharts /></el-icon>
+              <span>质控图分析</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
       <el-main class="app-main">
