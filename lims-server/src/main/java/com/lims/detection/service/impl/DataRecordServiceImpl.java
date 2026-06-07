@@ -711,8 +711,6 @@ public class DataRecordServiceImpl extends ServiceImpl<DetDataRecordMapper, DetD
 
         saveAuditLog("data_record", record.getId(), record.getRecordNo(),
                 "import", null, null, null, false, "仪器文件导入: " + fileName);
-
-        throw new BizException("仪器数据解析功能待实现，请手动录入数据");
     }
 
     @Override

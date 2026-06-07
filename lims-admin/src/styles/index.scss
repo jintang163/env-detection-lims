@@ -1,0 +1,157 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+#app {
+  height: 100%;
+}
+
+.page-container {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  min-height: calc(100vh - 120px);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .page-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #303133;
+  }
+}
+
+.search-form {
+  background: #fafafa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+
+  .el-form-item {
+    margin-bottom: 16px;
+  }
+}
+
+.table-toolbar {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-tag {
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+
+  &.status-draft {
+    background: #f0f0f0;
+    color: #909399;
+  }
+
+  &.status-pending {
+    background: #ecf5ff;
+    color: #409EFF;
+  }
+
+  &.status-passed {
+    background: #f0f9eb;
+    color: #67c23a;
+  }
+
+  &.status-rejected {
+    background: #fef0f0;
+    color: #f56c6c;
+  }
+
+  &.status-oos {
+    background: #fdf6ec;
+    color: #e6a23c;
+  }
+}
+
+.detail-card {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #303133;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ebeef5;
+  }
+}
+
+.oos-badge {
+  background: #f56c6c;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.trace-tree {
+  .el-tree-node__content {
+    height: 40px;
+    line-height: 40px;
+  }
+
+  .trace-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .node-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+
+      &.sample { background: #409EFF; }
+      &.task { background: #67c23a; }
+      &.data { background: #e6a23c; }
+      &.original { background: #909399; }
+      &.report { background: #f56c6c; }
+      &.equipment { background: #13ce66; }
+    }
+
+    .node-info {
+      .node-name {
+        font-weight: 500;
+        color: #303133;
+      }
+      .node-no {
+        color: #909399;
+        font-size: 12px;
+        margin-left: 8px;
+      }
+    }
+  }
+}

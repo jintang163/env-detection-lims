@@ -125,7 +125,7 @@ public class DataReviewServiceImpl extends ServiceImpl<DetDataReviewMapper, DetD
         dataRecord.setFirstReviewResult(dto.getReviewResult());
 
         if (dto.getReviewResult() == REVIEW_RESULT_PASS) {
-            dataRecord.setStatus(STATUS_FIRST_REVIEW_PASSED);
+            dataRecord.setStatus(STATUS_PENDING_SECOND_REVIEW);
         } else {
             dataRecord.setStatus(STATUS_REJECTED);
             dataRecord.setRemark(dto.getRejectReason());
