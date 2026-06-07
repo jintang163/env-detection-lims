@@ -93,6 +93,24 @@
               <span>CAPA管理</span>
             </el-menu-item>
           </el-sub-menu>
+          <el-sub-menu index="reagent">
+            <template #title>
+              <el-icon><Box /></el-icon>
+              <span>试剂与标准物质管理</span>
+            </template>
+            <el-menu-item index="/reagent/ledger">
+              <el-icon><Beaker /></el-icon>
+              <span>试剂台账</span>
+            </el-menu-item>
+            <el-menu-item index="/reagent/standard">
+              <el-icon><ColdDrink /></el-icon>
+              <span>标准物质/标准溶液</span>
+            </el-menu-item>
+            <el-menu-item index="/reagent/consumable">
+              <el-icon><Goods /></el-icon>
+              <span>耗材管理</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
       <el-main class="app-main">

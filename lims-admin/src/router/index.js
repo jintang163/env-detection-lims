@@ -100,6 +100,24 @@ const routes = [
     name: 'CapaManagement',
     component: () => import('@/views/detection/CapaManagement.vue'),
     meta: { title: 'CAPA管理' }
+  },
+  {
+    path: '/reagent/ledger',
+    name: 'ReagentLedger',
+    component: () => import('@/views/reagent/ReagentLedger.vue'),
+    meta: { title: '试剂台账' }
+  },
+  {
+    path: '/reagent/standard',
+    name: 'StandardMaterial',
+    component: () => import('@/views/reagent/StandardMaterial.vue'),
+    meta: { title: '标准物质/标准溶液' }
+  },
+  {
+    path: '/reagent/consumable',
+    name: 'ConsumableManagement',
+    component: () => import('@/views/reagent/ConsumableManagement.vue'),
+    meta: { title: '耗材管理' }
   }
 ]
 
