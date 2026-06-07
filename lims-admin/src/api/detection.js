@@ -109,3 +109,75 @@ export const qualityControlApi = {
   analyze: (params) => request.post('/detection/qualityControl/analyze', params),
   exportReport: (params) => request.get('/detection/qualityControl/report/export', { params, responseType: 'blob' })
 }
+
+// =============================================
+// 能力验证与实验室间比对 API
+// =============================================
+export const proficiencyTestApi = {
+  planPage: (params) => request.get('/detection/proficiencyTest/page', { params }),
+  getPlan: (id) => request.get(`/detection/proficiencyTest/${id}`),
+  savePlan: (data) => request.post('/detection/proficiencyTest', data),
+  updatePlan: (data) => request.put('/detection/proficiencyTest', data),
+  deletePlan: (id) => request.delete(`/detection/proficiencyTest/${id}`),
+  register: (id) => request.post(`/detection/proficiencyTest/${id}/register`),
+  receiveSample: (id) => request.post(`/detection/proficiencyTest/${id}/receiveSample`),
+  saveResult: (data) => request.post('/detection/proficiencyTest/result/save', data),
+  reportResult: (data) => request.post('/detection/proficiencyTest/result/report', data),
+  getZScore: (id) => request.get(`/detection/proficiencyTest/${id}/zscore`),
+  getYoudenData: (id) => request.get(`/detection/proficiencyTest/${id}/youden`),
+  getStats: () => request.get('/detection/proficiencyTest/stats')
+}
+
+// =============================================
+// 标准曲线管理 API
+// =============================================
+export const standardCurveApi = {
+  page: (params) => request.get('/detection/standardCurve/page', { params }),
+  getDetail: (id) => request.get(`/detection/standardCurve/${id}`),
+  save: (data) => request.post('/detection/standardCurve', data),
+  update: (data) => request.put('/detection/standardCurve', data),
+  delete: (id) => request.delete(`/detection/standardCurve/${id}`),
+  calculate: (data) => request.post('/detection/standardCurve/calculate', data),
+  getPoints: (id) => request.get(`/detection/standardCurve/${id}/points`),
+  getValidCurves: (itemCode) => request.get(`/detection/standardCurve/valid/${itemCode}`),
+  getStats: () => request.get('/detection/standardCurve/stats'),
+  verify: (id, data) => request.post(`/detection/standardCurve/${id}/verify`, data)
+}
+
+// =============================================
+// 稳定性考察 API
+// =============================================
+export const stabilityApi = {
+  page: (params) => request.get('/detection/stability/page', { params }),
+  getDetail: (id) => request.get(`/detection/stability/${id}`),
+  save: (data) => request.post('/detection/stability', data),
+  update: (data) => request.put('/detection/stability', data),
+  delete: (id) => request.delete(`/detection/stability/${id}`),
+  start: (id) => request.post(`/detection/stability/${id}/start`),
+  recordResult: (pointId, data) => request.post(`/detection/stability/point/${pointId}/record`, data),
+  getTrend: (id) => request.get(`/detection/stability/${id}/trend`),
+  estimate: (id) => request.get(`/detection/stability/${id}/estimate`),
+  generateReport: (id) => request.get(`/detection/stability/${id}/generateReport`, { responseType: 'blob' }),
+  getStats: () => request.get('/detection/stability/stats')
+}
+
+// =============================================
+// CAPA纠正预防措施 API
+// =============================================
+export const capaApi = {
+  page: (params) => request.get('/detection/capa/page', { params }),
+  getDetail: (id) => request.get(`/detection/capa/${id}`),
+  save: (data) => request.post('/detection/capa', data),
+  update: (data) => request.put('/detection/capa', data),
+  delete: (id) => request.delete(`/detection/capa/${id}`),
+  submit: (id) => request.post(`/detection/capa/${id}/submit`),
+  approve: (id, data) => request.post(`/detection/capa/${id}/approve`, data),
+  reject: (id, data) => request.post(`/detection/capa/${id}/reject`, data),
+  executeComplete: (id, data) => request.post(`/detection/capa/${id}/executeComplete`, data),
+  verifyPass: (id, data) => request.post(`/detection/capa/${id}/verifyPass`, data),
+  verifyFail: (id, data) => request.post(`/detection/capa/${id}/verifyFail`, data),
+  close: (id, data) => request.post(`/detection/capa/${id}/close`, data),
+  getLogs: (id) => request.get(`/detection/capa/${id}/logs`),
+  getStats: () => request.get('/detection/capa/stats'),
+  getOverdue: () => request.get('/detection/capa/overdue')
+}

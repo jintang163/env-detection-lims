@@ -76,6 +76,30 @@ const routes = [
     name: 'QualityControlChart',
     component: () => import('@/views/detection/QualityControlChart.vue'),
     meta: { title: '质控图分析' }
+  },
+  {
+    path: '/detection/proficiency',
+    name: 'ProficiencyTest',
+    component: () => import('@/views/detection/ProficiencyTest.vue'),
+    meta: { title: '能力验证与比对' }
+  },
+  {
+    path: '/detection/standardCurve',
+    name: 'StandardCurve',
+    component: () => import('@/views/detection/StandardCurve.vue'),
+    meta: { title: '标准曲线管理' }
+  },
+  {
+    path: '/detection/stability',
+    name: 'StabilityTest',
+    component: () => import('@/views/detection/StabilityTest.vue'),
+    meta: { title: '稳定性考察' }
+  },
+  {
+    path: '/detection/capa',
+    name: 'CapaManagement',
+    component: () => import('@/views/detection/CapaManagement.vue'),
+    meta: { title: 'CAPA管理' }
   }
 ]
 

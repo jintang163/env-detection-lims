@@ -71,6 +71,28 @@
               <span>质控图分析</span>
             </el-menu-item>
           </el-sub-menu>
+          <el-sub-menu index="advancedQuality">
+            <template #title>
+              <el-icon><Medal /></el-icon>
+              <span>高级质量管理</span>
+            </template>
+            <el-menu-item index="/detection/proficiency">
+              <el-icon><Trophy /></el-icon>
+              <span>能力验证与比对</span>
+            </el-menu-item>
+            <el-menu-item index="/detection/standardCurve">
+              <el-icon><Histogram /></el-icon>
+              <span>标准曲线管理</span>
+            </el-menu-item>
+            <el-menu-item index="/detection/stability">
+              <el-icon><TrendCharts /></el-icon>
+              <span>稳定性考察</span>
+            </el-menu-item>
+            <el-menu-item index="/detection/capa">
+              <el-icon><CircleCheck /></el-icon>
+              <span>CAPA管理</span>
+            </el-menu-item>
+          </el-sub-menu>
         </el-menu>
       </el-aside>
       <el-main class="app-main">
