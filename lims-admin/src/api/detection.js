@@ -75,13 +75,16 @@ export const qualityControlApi = {
   rulePage: (params) => request.get('/detection/qualityControl/rule/page', { params }),
   ruleStats: () => request.get('/detection/qualityControl/rule/stats'),
   getRule: (id) => request.get(`/detection/qualityControl/rule/${id}`),
+  getEnabledRules: () => request.get('/detection/qualityControl/rule/enabled'),
   saveRule: (data) => request.post('/detection/qualityControl/rule', data),
   updateRule: (data) => request.put('/detection/qualityControl/rule', data),
   deleteRule: (id) => request.delete(`/detection/qualityControl/rule/${id}`),
   toggleRule: (id, enabled) => request.put(`/detection/qualityControl/rule/${id}/toggle`, null, { params: { enabled } }),
 
   samplePage: (params) => request.get('/detection/qualityControl/sample/page', { params }),
+  sampleStats: () => request.get('/detection/qualityControl/sample/stats'),
   getSample: (id) => request.get(`/detection/qualityControl/sample/${id}`),
+  getValidSamples: () => request.get('/detection/qualityControl/sample/valid'),
   saveSample: (data) => request.post('/detection/qualityControl/sample', data),
   updateSample: (data) => request.put('/detection/qualityControl/sample', data),
   deleteSample: (id) => request.delete(`/detection/qualityControl/sample/${id}`),
@@ -91,6 +94,7 @@ export const qualityControlApi = {
   savePrepare: (data) => request.post('/detection/qualityControl/prepare', data),
 
   planPage: (params) => request.get('/detection/qualityControl/plan/page', { params }),
+  planStats: () => request.get('/detection/qualityControl/plan/stats'),
   getPlan: (id) => request.get(`/detection/qualityControl/plan/${id}`),
   savePlan: (data) => request.post('/detection/qualityControl/plan', data),
   updatePlan: (data) => request.put('/detection/qualityControl/plan', data),
@@ -102,6 +106,6 @@ export const qualityControlApi = {
   executeRecord: (id, data) => request.post(`/detection/qualityControl/record/${id}/execute`, data),
 
   chartData: (params) => request.get('/detection/qualityControl/chart/data', { params }),
-  analyze: (params) => request.post('/detection/qualityControl/analyze', null, { params }),
+  analyze: (params) => request.post('/detection/qualityControl/analyze', params),
   exportReport: (params) => request.get('/detection/qualityControl/report/export', { params, responseType: 'blob' })
 }

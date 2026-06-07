@@ -293,15 +293,12 @@ let cusumChart = null
 
 const searchForm = reactive({
   project: 'Cu',
-  sampleId: 1,
+  sampleId: null,
   dateRange: [dayjs().subtract(30, 'day').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')]
 })
 
-const qcSampleList = ref([
-  { id: 1, sampleName: '铜标准样(1.0mg/L)', sampleType: 'STANDARD', mean: 1.0, sd: 0.035, unit: 'mg/L' },
-  { id: 2, sampleName: '铅标准样(20μg/L)', sampleType: 'STANDARD', mean: 20.0, sd: 0.85, unit: 'μg/L' },
-  { id: 3, sampleName: '实验室空白', sampleType: 'BLANK', mean: 0.001, sd: 0.0005, unit: 'mg/L' }
-])
+const qcSampleList = ref([])
+const enabledRules = ref([])
 
 const activeChartType = ref('levey')
 
@@ -326,6 +323,7 @@ const chartData = ref([])
 const violationData = ref([])
 const detailVisible = ref(false)
 const currentDetail = ref(null)
+const currentSampleInfo = ref(null)
 
 const stats = reactive({
   total: 0,
@@ -338,182 +336,37 @@ const stats = reactive({
 
 const overallStatus = ref('in_control')
 
-const calculateMean = (arr) => {
-  if (!arr || arr.length === 0) return 0
-  return arr.reduce((sum, val) => sum + val, 0) / arr.length
-}
-
-const calculateSD = (arr, mean) => {
-  if (!arr || arr.length === 0) return 0
-  const m = mean !== undefined ? mean : calculateMean(arr)
-  const squaredDiffs = arr.map(val => Math.pow(val - m, 2))
-  return Math.sqrt(squaredDiffs.reduce((sum, val) => sum + val, 0) / (arr.length - 1))
-}
-
-const calculateZScore = (value, mean, sd) => {
-  if (sd === 0) return 0
-  return (value - mean) / sd
-}
-
-const calculateCusum = (values, mean, k = 0.5) => {
-  const cusumPos = []
-  const cusumNeg = []
-  let cp = 0
-  let cn = 0
-
-  values.forEach((val, i) => {
-    const deviation = val - mean
-    cp = Math.max(0, cp + deviation - k * stats.sd)
-    cn = Math.min(0, cn + deviation + k * stats.sd)
-    cusumPos.push(cp)
-    cusumNeg.push(cn)
-  })
-
-  return { cusumPos, cusumNeg }
-}
-
-const checkWestgardRules = (data, mean, sd) => {
-  const results = []
-  const values = data.map(d => d.measuredValue)
-
-  for (let i = 0; i < data.length; i++) {
-    const violations = []
-    const z = calculateZScore(values[i], mean, sd)
-    const absZ = Math.abs(z)
-
-    if (absZ > 2) {
-      violations.push({
-        ruleCode: '1₂s',
-        ruleName: '1-2s警告规则',
-        type: 1,
-        description: '单个质控测定值超过均值±2SD',
-        formula: '|x - μ| > 2SD'
-      })
-    }
-
-    if (absZ > 3) {
-      violations.push({
-        ruleCode: '1₃s',
-        ruleName: '1-3s失控规则',
-        type: 2,
-        description: '单个质控测定值超过均值±3SD',
-        formula: '|x - μ| > 3SD'
-      })
-    }
-
-    if (i >= 1) {
-      const z1 = calculateZScore(values[i - 1], mean, sd)
-      if ((z > 2 && z1 > 2) || (z < -2 && z1 < -2)) {
-        violations.push({
-          ruleCode: '2₂s',
-          ruleName: '2-2s失控规则',
-          type: 2,
-          description: '两个连续的质控测定值同时超过均值+2SD或均值-2SD',
-          formula: '连续2个值 > μ+2SD 或 < μ-2SD'
-        })
+const fetchQcSamples = async () => {
+  try {
+    const res = await qualityControlApi.getValidSamples()
+    if (res.data) {
+      qcSampleList.value = res.data
+      if (qcSampleList.value.length > 0 && !searchForm.sampleId) {
+        searchForm.sampleId = qcSampleList.value[0].id
       }
     }
-
-    if (i >= 3) {
-      let allAbove1Sd = true
-      let allBelow1Sd = true
-      for (let j = 0; j < 4; j++) {
-        const zj = calculateZScore(values[i - j], mean, sd)
-        if (zj <= 1) allAbove1Sd = false
-        if (zj >= -1) allBelow1Sd = false
-      }
-      if (allAbove1Sd || allBelow1Sd) {
-        violations.push({
-          ruleCode: '4₁s',
-          ruleName: '4-1s失控规则',
-          type: 2,
-          description: '4个连续的质控测定值同时超过均值+1SD或均值-1SD',
-          formula: '连续4个值 > μ+1SD 或 < μ-1SD'
-        })
-      }
-    }
-
-    if (i >= 9) {
-      let allAboveMean = true
-      let allBelowMean = true
-      for (let j = 0; j < 10; j++) {
-        const zj = calculateZScore(values[i - j], mean, sd)
-        if (zj <= 0) allAboveMean = false
-        if (zj >= 0) allBelowMean = false
-      }
-      if (allAboveMean || allBelowMean) {
-        violations.push({
-          ruleCode: '10ₓ',
-          ruleName: '10-x失控规则',
-          type: 2,
-          description: '10个连续的质控测定值全部落在均值的同一侧',
-          formula: '连续10个值同时 > μ 或 < μ'
-        })
-      }
-    }
-
-    let status = 'in_control'
-    if (violations.length > 0) {
-      const hasReject = violations.some(v => v.type === 2)
-      status = hasReject ? 'out_control' : 'warning'
-    }
-
-    results.push({
-      ...data[i],
-      zScore: z,
-      violatedRules: violations,
-      status: status
-    })
+  } catch (error) {
+    console.error('获取质控样品列表失败', error)
   }
-
-  return results
 }
 
-const generateMockData = () => {
-  const currentSample = qcSampleList.value.find(s => s.id === searchForm.sampleId) || qcSampleList.value[0]
-  const mean = currentSample.mean
-  const sd = currentSample.sd
-  const unit = currentSample.unit
-  const count = 30
-  const data = []
-
-  for (let i = 0; i < count; i++) {
-    const random = Math.random()
-    let measuredValue
-
-    if (i === 8) {
-      measuredValue = mean + 3.2 * sd
-    } else if (i === 15) {
-      measuredValue = mean + 2.5 * sd
-    } else if (i === 16) {
-      measuredValue = mean + 2.3 * sd
-    } else if (i === 22) {
-      measuredValue = mean - 2.8 * sd
-    } else if (i >= 25 && i <= 28) {
-      measuredValue = mean + 1.2 * sd + (Math.random() - 0.5) * 0.2 * sd
-    } else {
-      measuredValue = mean + (Math.random() - 0.5) * 2 * sd * 0.8
+const fetchEnabledRules = async () => {
+  try {
+    const res = await qualityControlApi.getEnabledRules()
+    if (res.data) {
+      enabledRules.value = res.data
     }
-
-    data.push({
-      seqNo: i + 1,
-      batchNo: `B${dayjs().subtract(count - i, 'day').format('YYYYMMDD')}${String(i + 1).padStart(3, '0')}`,
-      measureDate: dayjs().subtract(count - i, 'day').format('YYYY-MM-DD HH:mm:ss'),
-      measuredValue: parseFloat(measuredValue.toFixed(4)),
-      unit: unit,
-      sampleName: currentSample.sampleName,
-      project: searchForm.project,
-      methodName: '火焰原子吸收分光光度法',
-      operator: ['张三', '李四', '王五'][i % 3],
-      mean: mean,
-      sd: sd
-    })
+  } catch (error) {
+    console.error('获取启用规则失败', error)
   }
-
-  return data
 }
 
 const fetchData = async () => {
+  if (!searchForm.sampleId) {
+    ElMessage.warning('请先选择质控样品')
+    return
+  }
+
   try {
     const params = {
       project: searchForm.project,
@@ -522,61 +375,82 @@ const fetchData = async () => {
       endDate: searchForm.dateRange[1]
     }
 
-    const res = await qualityControlApi.chartData(params)
+    const res = await qualityControlApi.analyze(params)
     if (res.data) {
-      chartData.value = res.data
-    } else {
-      chartData.value = generateMockData()
+      const analyzeResult = res.data
+      
+      stats.total = analyzeResult.total || 0
+      stats.inControl = analyzeResult.inControl || 0
+      stats.warning = analyzeResult.warning || 0
+      stats.outControl = analyzeResult.outControl || 0
+      stats.mean = analyzeResult.mean || 0
+      stats.sd = analyzeResult.sd || 0
+      overallStatus.value = analyzeResult.overallStatus || 'in_control'
+      
+      if (analyzeResult.violationData && analyzeResult.violationData.length > 0) {
+        violationData.value = analyzeResult.violationData
+        chartData.value = analyzeResult.violationData
+      } else {
+        violationData.value = []
+        chartData.value = []
+      }
+
+      if (analyzeResult.mean && analyzeResult.sd) {
+        currentSampleInfo.value = {
+          mean: analyzeResult.mean,
+          sd: analyzeResult.sd,
+          unit: analyzeResult.violationData?.[0]?.unit || ''
+        }
+      }
+
+      const sample = qcSampleList.value.find(s => s.id === searchForm.sampleId)
+      if (sample) {
+        currentSampleInfo.value = currentSampleInfo.value || {}
+        currentSampleInfo.value.unit = sample.unit || currentSampleInfo.value.unit || ''
+        currentSampleInfo.value.sampleName = sample.sampleName
+      }
+
+      if (analyzeResult.violationData) {
+        analyzeResult.violationData.forEach((v, i) => {
+          v.suggestion = v.status === 'in_control' 
+            ? '数据在控，可正常报告结果。' 
+            : v.status === 'warning'
+            ? '数据警告，建议检查实验操作、试剂、仪器状态，必要时复测。'
+            : '数据失控，请立即查找原因，采取纠正措施，经评估后决定是否复测或报废。'
+        })
+      }
+
+      renderAllCharts()
     }
   } catch (error) {
-    chartData.value = generateMockData()
+    console.error('获取质控分析数据失败', error)
+    ElMessage.error('获取质控分析数据失败')
+    violationData.value = []
+    chartData.value = []
   }
+}
 
-  const values = chartData.value.map(d => d.measuredValue)
-  stats.mean = calculateMean(values)
-  stats.sd = calculateSD(values, stats.mean)
-  stats.total = chartData.value.length
-
-  const currentSample = qcSampleList.value.find(s => s.id === searchForm.sampleId) || qcSampleList.value[0]
-  violationData.value = checkWestgardRules(chartData.value, currentSample.mean, currentSample.sd)
-
-  stats.inControl = violationData.value.filter(v => v.status === 'in_control').length
-  stats.warning = violationData.value.filter(v => v.status === 'warning').length
-  stats.outControl = violationData.value.filter(v => v.status === 'out_control').length
-
-  if (stats.outControl > 0) {
-    overallStatus.value = 'out_control'
-  } else if (stats.warning > 0) {
-    overallStatus.value = 'warning'
-  } else {
-    overallStatus.value = 'in_control'
+const getCurrentSampleInfo = () => {
+  if (currentSampleInfo.value) {
+    return currentSampleInfo.value
   }
-
-  const cusumResult = calculateCusum(values, stats.mean, cusumK.value)
-  violationData.value.forEach((v, i) => {
-    v.cusum = Math.max(Math.abs(cusumResult.cusumPos[i]), Math.abs(cusumResult.cusumNeg[i]))
-    v.suggestion = v.status === 'in_control' 
-      ? '数据在控，可正常报告结果。' 
-      : v.status === 'warning'
-      ? '数据警告，建议检查实验操作、试剂、仪器状态，必要时复测。'
-      : '数据失控，请立即查找原因，采取纠正措施，经评估后决定是否复测或报废。'
-  })
-
-  renderAllCharts()
+  const sample = qcSampleList.value.find(s => s.id === searchForm.sampleId)
+  return sample || { mean: 0, sd: 0, unit: '' }
 }
 
 const renderLeveyChart = () => {
-  if (!leveyChartRef.value) return
+  if (!leveyChartRef.value || violationData.value.length === 0) return
 
   if (!leveyChart) {
     leveyChart = echarts.init(leveyChartRef.value)
   }
 
-  const currentSample = qcSampleList.value.find(s => s.id === searchForm.sampleId) || qcSampleList.value[0]
-  const mean = currentSample.mean
-  const sd = currentSample.sd
+  const sampleInfo = getCurrentSampleInfo()
+  const mean = sampleInfo.mean || stats.mean
+  const sd = sampleInfo.sd || stats.sd
+  const unit = sampleInfo.unit || ''
 
-  const xData = violationData.value.map((d, i) => `#${i + 1}`)
+  const xData = violationData.value.map((d, i) => `#${d.seqNo || i + 1}`)
   const yData = violationData.value.map(d => d.measuredValue)
 
   const markLines = []
@@ -629,14 +503,14 @@ const renderLeveyChart = () => {
     violationData.value.forEach((d, i) => {
       if (d.status === 'warning') {
         scatterData.push({
-          name: d.violatedRules.map(r => r.ruleCode).join(','),
+          name: d.violatedRules?.map(r => r.ruleCode).join(',') || '警告',
           value: [xData[i], d.measuredValue],
           itemStyle: { color: '#E6A23C' },
           symbolSize: 12
         })
       } else if (d.status === 'out_control') {
         scatterData.push({
-          name: d.violatedRules.map(r => r.ruleCode).join(','),
+          name: d.violatedRules?.map(r => r.ruleCode).join(',') || '失控',
           value: [xData[i], d.measuredValue],
           itemStyle: { color: '#F56C6C' },
           symbolSize: 14
@@ -651,11 +525,11 @@ const renderLeveyChart = () => {
       formatter: (params) => {
         const idx = params[0].dataIndex
         const d = violationData.value[idx]
-        let html = `<div style="font-weight: bold; margin-bottom: 8px">${d.batchNo}</div>`
-        html += `<div>序号: ${d.seqNo}</div>`
-        html += `<div>测定值: ${d.measuredValue} ${d.unit}</div>`
-        html += `<div>Z分数: ${d.zScore.toFixed(4)}</div>`
-        if (d.violatedRules.length > 0) {
+        let html = `<div style="font-weight: bold; margin-bottom: 8px">${d.batchNo || '-'}</div>`
+        html += `<div>序号: ${d.seqNo || idx + 1}</div>`
+        html += `<div>测定值: ${d.measuredValue} ${d.unit || unit}</div>`
+        html += `<div>Z分数: ${d.zScore ? d.zScore.toFixed(4) : '-'}</div>`
+        if (d.violatedRules && d.violatedRules.length > 0) {
           html += `<div style="margin-top: 8px; color: ${d.status === 'out_control' ? '#F56C6C' : '#E6A23C'}">违反规则: ${d.violatedRules.map(r => r.ruleCode).join(', ')}</div>`
         } else {
           html += `<div style="margin-top: 8px; color: #67C23A">在控</div>`
@@ -677,7 +551,7 @@ const renderLeveyChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: `测定值 (${currentSample.unit})`,
+      name: `测定值 (${unit})`,
       scale: true
     },
     series: [
@@ -716,14 +590,14 @@ const renderLeveyChart = () => {
 }
 
 const renderZscoreChart = () => {
-  if (!zscoreChartRef.value) return
+  if (!zscoreChartRef.value || violationData.value.length === 0) return
 
   if (!zscoreChart) {
     zscoreChart = echarts.init(zscoreChartRef.value)
   }
 
-  const xData = violationData.value.map((d, i) => `#${i + 1}`)
-  const yData = violationData.value.map(d => d.zScore)
+  const xData = violationData.value.map((d, i) => `#${d.seqNo || i + 1}`)
+  const yData = violationData.value.map(d => d.zScore || 0)
 
   const markLines = []
   if (showZMeanLine.value) {
@@ -775,15 +649,15 @@ const renderZscoreChart = () => {
     violationData.value.forEach((d, i) => {
       if (d.status === 'warning') {
         scatterData.push({
-          name: d.violatedRules.map(r => r.ruleCode).join(','),
-          value: [xData[i], d.zScore],
+          name: d.violatedRules?.map(r => r.ruleCode).join(',') || '警告',
+          value: [xData[i], d.zScore || 0],
           itemStyle: { color: '#E6A23C' },
           symbolSize: 12
         })
       } else if (d.status === 'out_control') {
         scatterData.push({
-          name: d.violatedRules.map(r => r.ruleCode).join(','),
-          value: [xData[i], d.zScore],
+          name: d.violatedRules?.map(r => r.ruleCode).join(',') || '失控',
+          value: [xData[i], d.zScore || 0],
           itemStyle: { color: '#F56C6C' },
           symbolSize: 14
         })
@@ -797,10 +671,10 @@ const renderZscoreChart = () => {
       formatter: (params) => {
         const idx = params[0].dataIndex
         const d = violationData.value[idx]
-        let html = `<div style="font-weight: bold; margin-bottom: 8px">${d.batchNo}</div>`
-        html += `<div>序号: ${d.seqNo}</div>`
-        html += `<div>Z分数: ${d.zScore.toFixed(4)}</div>`
-        if (d.violatedRules.length > 0) {
+        let html = `<div style="font-weight: bold; margin-bottom: 8px">${d.batchNo || '-'}</div>`
+        html += `<div>序号: ${d.seqNo || idx + 1}</div>`
+        html += `<div>Z分数: ${d.zScore ? d.zScore.toFixed(4) : '-'}</div>`
+        if (d.violatedRules && d.violatedRules.length > 0) {
           html += `<div style="margin-top: 8px; color: ${d.status === 'out_control' ? '#F56C6C' : '#E6A23C'}">违反规则: ${d.violatedRules.map(r => r.ruleCode).join(', ')}</div>`
         } else {
           html += `<div style="margin-top: 8px; color: #67C23A">在控</div>`
@@ -861,17 +735,31 @@ const renderZscoreChart = () => {
 }
 
 const renderCusumChart = () => {
-  if (!cusumChartRef.value) return
+  if (!cusumChartRef.value || violationData.value.length === 0) return
 
   if (!cusumChart) {
     cusumChart = echarts.init(cusumChartRef.value)
   }
 
   const values = chartData.value.map(d => d.measuredValue)
-  const { cusumPos, cusumNeg } = calculateCusum(values, stats.mean, cusumK.value)
+  const mean = getCurrentSampleInfo().mean || stats.mean
+  const sd = getCurrentSampleInfo().sd || stats.sd
 
-  const xData = violationData.value.map((d, i) => `#${i + 1}`)
-  const hLimit = cusumH.value * stats.sd
+  const cusumPos = []
+  const cusumNeg = []
+  let cp = 0
+  let cn = 0
+
+  values.forEach((val) => {
+    const deviation = val - mean
+    cp = Math.max(0, cp + deviation - cusumK.value * sd)
+    cn = Math.min(0, cn + deviation + cusumK.value * sd)
+    cusumPos.push(cp)
+    cusumNeg.push(cn)
+  })
+
+  const xData = violationData.value.map((d, i) => `#${d.seqNo || i + 1}`)
+  const hLimit = cusumH.value * sd
 
   const scatterData = []
   if (showCusumViolation.value) {
@@ -908,8 +796,8 @@ const renderCusumChart = () => {
       formatter: (params) => {
         const idx = params[0].dataIndex
         const d = violationData.value[idx]
-        let html = `<div style="font-weight: bold; margin-bottom: 8px">${d.batchNo}</div>`
-        html += `<div>序号: ${d.seqNo}</div>`
+        let html = `<div style="font-weight: bold; margin-bottom: 8px">${d.batchNo || '-'}</div>`
+        html += `<div>序号: ${d.seqNo || idx + 1}</div>`
         html += `<div>Cusum (+): ${cusumPos[idx].toFixed(4)}</div>`
         html += `<div>Cusum (-): ${cusumNeg[idx].toFixed(4)}</div>`
         if (cusumPos[idx] > hLimit || Math.abs(cusumNeg[idx]) > hLimit) {
@@ -1010,13 +898,32 @@ const handleSearch = () => {
 
 const handleReset = () => {
   searchForm.project = 'Cu'
-  searchForm.sampleId = 1
+  searchForm.sampleId = qcSampleList.value.length > 0 ? qcSampleList.value[0].id : null
   searchForm.dateRange = [dayjs().subtract(30, 'day').format('YYYY-MM-DD'), dayjs().format('YYYY-MM-DD')]
   fetchData()
 }
 
-const handleExport = () => {
-  ElMessage.success('导出功能开发中')
+const handleExport = async () => {
+  try {
+    const params = {
+      project: searchForm.project,
+      sampleId: searchForm.sampleId,
+      startDate: searchForm.dateRange[0],
+      endDate: searchForm.dateRange[1]
+    }
+    const res = await qualityControlApi.exportReport(params)
+    const blob = new Blob([res], { type: 'application/pdf' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `质控报告_${dayjs().format('YYYYMMDDHHmmss')}.pdf`
+    a.click()
+    URL.revokeObjectURL(url)
+    ElMessage.success('导出成功')
+  } catch (error) {
+    console.error('导出失败', error)
+    ElMessage.error('导出失败')
+  }
 }
 
 const handleViewDetail = (row) => {
@@ -1038,12 +945,16 @@ watch([showZMeanLine, showZ1SdLine, showZ2SdLine, showZ3SdLine, showZViolationMa
   renderZscoreChart()
 })
 
-watch([showCusumLimit, showCusumViolation], () => {
+watch([showCusumLimit, showCusumViolation, cusumH, cusumK], () => {
   renderCusumChart()
 })
 
-onMounted(() => {
-  fetchData()
+onMounted(async () => {
+  await fetchQcSamples()
+  await fetchEnabledRules()
+  if (searchForm.sampleId) {
+    fetchData()
+  }
   window.addEventListener('resize', handleResize)
 })
 

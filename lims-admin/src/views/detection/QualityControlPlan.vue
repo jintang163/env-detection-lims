@@ -576,124 +576,6 @@ const formRules = {
   startDate: [{ required: true, message: '请选择开始日期', trigger: 'change' }]
 }
 
-const mockPlans = [
-  {
-    id: 1,
-    planNo: 'QCP-2024-001',
-    planName: '水质铜检测日常质控',
-    projectName: '铜',
-    methodName: '火焰原子吸收分光光度法',
-    cycleType: 'BATCH',
-    status: 1,
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    reminderEnabled: true,
-    reminderType: ['SYSTEM', 'EMAIL'],
-    reminderAdvance: 30,
-    reminderUsers: '张三,李四',
-    description: '每批次检测前需运行质控样',
-    qcSamples: [
-      { type: 'BLANK', sampleName: '实验室空白', concentration: 0, unit: 'mg/L', frequency: '每批次1个' },
-      { type: 'STANDARD', sampleName: '铜标准样', concentration: 1.0, unit: 'mg/L', frequency: '每批次1个' },
-      { type: 'PARALLEL', sampleName: '平行样', concentration: '', unit: 'mg/L', frequency: '每10个样品1对' }
-    ],
-    createTime: '2024-01-01 10:00:00'
-  },
-  {
-    id: 2,
-    planNo: 'QCP-2024-002',
-    planName: '水质铅检测日常质控',
-    projectName: '铅',
-    methodName: '石墨炉原子吸收分光光度法',
-    cycleType: 'DAILY',
-    status: 1,
-    startDate: '2024-01-01',
-    endDate: '2024-12-31',
-    reminderEnabled: true,
-    reminderType: ['SYSTEM'],
-    reminderAdvance: 60,
-    reminderUsers: '王五',
-    description: '每日首次检测前运行质控样',
-    qcSamples: [
-      { type: 'BLANK', sampleName: '试剂空白', concentration: 0, unit: 'μg/L', frequency: '每日1个' },
-      { type: 'STANDARD', sampleName: '铅标准样', concentration: 20.0, unit: 'μg/L', frequency: '每日1个' },
-      { type: 'SPIKE', sampleName: '加标样', concentration: 20.0, unit: 'μg/L', frequency: '每周1个' }
-    ],
-    createTime: '2024-01-02 14:30:00'
-  },
-  {
-    id: 3,
-    planNo: 'QCP-2024-003',
-    planName: '土壤镉检测周质控',
-    projectName: '镉',
-    methodName: '电感耦合等离子体质谱法',
-    cycleType: 'WEEKLY',
-    status: 0,
-    startDate: '2024-03-01',
-    endDate: '2024-12-31',
-    reminderEnabled: false,
-    reminderType: [],
-    reminderAdvance: 0,
-    reminderUsers: '',
-    description: '每周运行一次质控样',
-    qcSamples: [
-      { type: 'STANDARD', sampleName: '土壤标准物质', concentration: 0.5, unit: 'mg/kg', frequency: '每周1个' }
-    ],
-    createTime: '2024-02-20 09:00:00'
-  }
-]
-
-const mockRecords = [
-  {
-    id: 1,
-    recordNo: 'QCR-2024-0220-001',
-    executeDate: '2024-02-20 09:30:00',
-    batchNo: 'B20240220001',
-    qcSampleType: 'BLANK',
-    qcSampleName: '实验室空白',
-    measuredValue: 0.002,
-    unit: 'mg/L',
-    executeBy: '张三',
-    status: 2
-  },
-  {
-    id: 2,
-    recordNo: 'QCR-2024-0220-002',
-    executeDate: '2024-02-20 09:35:00',
-    batchNo: 'B20240220001',
-    qcSampleType: 'STANDARD',
-    qcSampleName: '铜标准样',
-    measuredValue: 0.985,
-    unit: 'mg/L',
-    executeBy: '张三',
-    status: 2
-  },
-  {
-    id: 3,
-    recordNo: 'QCR-2024-0221-001',
-    executeDate: '2024-02-21 10:00:00',
-    batchNo: 'B20240221001',
-    qcSampleType: 'BLANK',
-    qcSampleName: '实验室空白',
-    measuredValue: 0.001,
-    unit: 'mg/L',
-    executeBy: '李四',
-    status: 2
-  },
-  {
-    id: 4,
-    recordNo: 'QCR-2024-0221-002',
-    executeDate: '2024-02-21 10:05:00',
-    batchNo: 'B20240221001',
-    qcSampleType: 'STANDARD',
-    qcSampleName: '铜标准样',
-    measuredValue: 1.023,
-    unit: 'mg/L',
-    executeBy: '李四',
-    status: 0
-  }
-]
-
 const getCycleTypeText = (type) => {
   const map = {
     BATCH: '每批次',
@@ -744,11 +626,21 @@ const getExecuteStatusTag = (status) => {
   return map[status] || 'info'
 }
 
-const fetchStats = () => {
-  stats.total = tableData.value.length
-  stats.active = tableData.value.filter(r => r.status === 1).length
-  stats.today = 5
-  stats.missed = 1
+const fetchStats = async () => {
+  try {
+    const res = await qualityControlApi.planStats()
+    if (res.data) {
+      stats.total = res.data.total || 0
+      stats.active = res.data.active || 0
+      stats.today = res.data.today || 0
+      stats.missed = res.data.missed || 0
+    }
+  } catch (error) {
+    stats.total = tableData.value.length
+    stats.active = tableData.value.filter(r => r.status === 1).length
+    stats.today = 0
+    stats.missed = 0
+  }
 }
 
 const fetchList = async () => {
@@ -766,46 +658,15 @@ const fetchList = async () => {
       tableData.value = res.data.records
       pagination.total = res.data.total
     } else {
-      let data = [...mockPlans]
-      if (searchKeyword.value) {
-        data = data.filter(item =>
-          item.planName.includes(searchKeyword.value) ||
-          item.planNo.includes(searchKeyword.value) ||
-          item.projectName.includes(searchKeyword.value)
-        )
-      }
-      if (searchCycle.value) {
-        data = data.filter(item => item.cycleType === searchCycle.value)
-      }
-      if (searchStatus.value !== null) {
-        data = data.filter(item => item.status === searchStatus.value)
-      }
-      pagination.total = data.length
-      const start = (pagination.pageNum - 1) * pagination.pageSize
-      const end = start + pagination.pageSize
-      tableData.value = data.slice(start, end)
+      tableData.value = []
+      pagination.total = 0
     }
-    fetchStats()
+    await fetchStats()
   } catch (error) {
-    let data = [...mockPlans]
-    if (searchKeyword.value) {
-      data = data.filter(item =>
-        item.planName.includes(searchKeyword.value) ||
-        item.planNo.includes(searchKeyword.value) ||
-        item.projectName.includes(searchKeyword.value)
-      )
-    }
-    if (searchCycle.value) {
-      data = data.filter(item => item.cycleType === searchCycle.value)
-    }
-    if (searchStatus.value !== null) {
-      data = data.filter(item => item.status === searchStatus.value)
-    }
-    pagination.total = data.length
-    const start = (pagination.pageNum - 1) * pagination.pageSize
-    const end = start + pagination.pageSize
-    tableData.value = data.slice(start, end)
-    fetchStats()
+    console.error('获取计划列表失败', error)
+    ElMessage.error('获取计划列表失败')
+    tableData.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
@@ -826,36 +687,14 @@ const fetchRecordList = async () => {
       recordTableData.value = res.data.records
       recordPagination.total = res.data.total
     } else {
-      let data = [...mockRecords]
-      if (recordSearchKeyword.value) {
-        data = data.filter(item =>
-          item.recordNo.includes(recordSearchKeyword.value) ||
-          item.qcSampleName.includes(recordSearchKeyword.value)
-        )
-      }
-      if (recordSearchStatus.value !== null) {
-        data = data.filter(item => item.status === recordSearchStatus.value)
-      }
-      recordPagination.total = data.length
-      const start = (recordPagination.pageNum - 1) * recordPagination.pageSize
-      const end = start + recordPagination.pageSize
-      recordTableData.value = data.slice(start, end)
+      recordTableData.value = []
+      recordPagination.total = 0
     }
   } catch (error) {
-    let data = [...mockRecords]
-    if (recordSearchKeyword.value) {
-      data = data.filter(item =>
-        item.recordNo.includes(recordSearchKeyword.value) ||
-        item.qcSampleName.includes(recordSearchKeyword.value)
-      )
-    }
-    if (recordSearchStatus.value !== null) {
-      data = data.filter(item => item.status === recordSearchStatus.value)
-    }
-    recordPagination.total = data.length
-    const start = (recordPagination.pageNum - 1) * recordPagination.pageSize
-    const end = start + recordPagination.pageSize
-    recordTableData.value = data.slice(start, end)
+    console.error('获取执行记录失败', error)
+    ElMessage.error('获取执行记录失败')
+    recordTableData.value = []
+    recordPagination.total = 0
   } finally {
     recordLoading.value = false
   }
@@ -914,9 +753,7 @@ const handleDelete = async (row) => {
     fetchList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      tableData.value = tableData.value.filter(item => item.id !== row.id)
-      ElMessage.success('删除成功')
-      fetchStats()
+      console.error('删除失败', error)
     }
   }
 }
@@ -934,9 +771,7 @@ const handlePause = async (row) => {
     fetchStats()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      row.status = 2
-      ElMessage.success('已暂停')
-      fetchStats()
+      console.error('暂停失败', error)
     }
   }
 }
@@ -954,9 +789,7 @@ const handleResume = async (row) => {
     fetchStats()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      row.status = 1
-      ElMessage.success('已恢复')
-      fetchStats()
+      console.error('恢复失败', error)
     }
   }
 }
@@ -989,22 +822,7 @@ const handleSubmit = async () => {
     fetchList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      if (planForm.id) {
-        const idx = tableData.value.findIndex(item => item.id === planForm.id)
-        if (idx > -1) {
-          tableData.value[idx] = { ...planForm }
-        }
-        ElMessage.success('更新成功')
-      } else {
-        tableData.value.unshift({
-          ...planForm,
-          id: Date.now(),
-          createTime: new Date().toLocaleString()
-        })
-        ElMessage.success('保存成功')
-      }
-      dialogVisible.value = false
-      fetchStats()
+      console.error('提交失败', error)
     }
   }
 }

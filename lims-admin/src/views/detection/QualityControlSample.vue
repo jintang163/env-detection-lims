@@ -637,128 +637,6 @@ const prepareRules = {
   prepareBy: [{ required: true, message: '请输入配制人', trigger: 'blur' }]
 }
 
-const mockSamples = [
-  {
-    id: 1,
-    sampleNo: 'QC-STD-2024-001',
-    sampleName: '铜标准溶液',
-    sampleType: 'STANDARD',
-    batchNo: 'B202401001',
-    concentration: 1000,
-    unit: 'μg/mL',
-    uncertainty: '±1%',
-    stockQuantity: 5,
-    prepareDate: '2024-01-15',
-    expireDate: dayjs().add(30, 'day').format('YYYY-MM-DD'),
-    storageCondition: '2-8℃冷藏',
-    traceability: '溯源至国家标准物质GBW08615',
-    createTime: '2024-01-15 10:00:00'
-  },
-  {
-    id: 2,
-    sampleNo: 'QC-STD-2024-002',
-    sampleName: '铅标准溶液',
-    sampleType: 'STANDARD',
-    batchNo: 'B202401002',
-    concentration: 1000,
-    unit: 'μg/mL',
-    uncertainty: '±1%',
-    stockQuantity: 3,
-    prepareDate: '2024-01-20',
-    expireDate: dayjs().add(7, 'day').format('YYYY-MM-DD'),
-    storageCondition: '2-8℃冷藏',
-    traceability: '溯源至国家标准物质GBW08619',
-    createTime: '2024-01-20 14:30:00'
-  },
-  {
-    id: 3,
-    sampleNo: 'QC-SPIKE-2024-001',
-    sampleName: '水质加标样',
-    sampleType: 'SPIKE',
-    batchNo: 'B202402001',
-    concentration: 0.5,
-    unit: 'mg/L',
-    uncertainty: '±5%',
-    stockQuantity: 10,
-    prepareDate: '2024-02-01',
-    expireDate: dayjs().add(90, 'day').format('YYYY-MM-DD'),
-    storageCondition: '2-8℃冷藏',
-    traceability: '自配,使用铜标准溶液配制',
-    createTime: '2024-02-01 09:00:00'
-  },
-  {
-    id: 4,
-    sampleNo: 'QC-BLANK-2024-001',
-    sampleName: '实验室空白',
-    sampleType: 'BLANK',
-    batchNo: 'B202402002',
-    concentration: 0,
-    unit: 'mg/L',
-    uncertainty: '',
-    stockQuantity: 20,
-    prepareDate: '2024-02-10',
-    expireDate: dayjs().add(7, 'day').format('YYYY-MM-DD'),
-    storageCondition: '常温保存',
-    traceability: '超纯水',
-    createTime: '2024-02-10 08:00:00'
-  },
-  {
-    id: 5,
-    sampleNo: 'QC-PAR-2024-001',
-    sampleName: '平行样-水质',
-    sampleType: 'PARALLEL',
-    batchNo: 'B202402003',
-    concentration: 1.2,
-    unit: 'mg/L',
-    uncertainty: '',
-    stockQuantity: 0,
-    prepareDate: '2024-01-01',
-    expireDate: '2024-01-15',
-    storageCondition: '2-8℃冷藏',
-    traceability: '',
-    createTime: '2024-02-15 10:00:00'
-  }
-]
-
-const mockPrepares = [
-  {
-    id: 1,
-    prepareNo: 'PRE-2024-001',
-    sampleName: '铜标准使用液',
-    sampleType: 'STANDARD',
-    batchNo: 'B202402010',
-    prepareVolume: 100,
-    volumeUnit: 'mL',
-    concentration: 10,
-    unit: 'μg/mL',
-    prepareMethod: '吸取10mL铜标准储备液(1000μg/mL)于100mL容量瓶中,用1%硝酸定容至刻度',
-    reagents: '铜标准储备液GBW08615, 优级纯硝酸, 超纯水',
-    instruments: '赛多利斯BSA224S天平, 大龙TopPette移液枪',
-    prepareBy: '张三',
-    verifyBy: '李四',
-    environment: '温度20℃, 湿度50%',
-    prepareTime: '2024-02-20 10:30:00'
-  },
-  {
-    id: 2,
-    prepareNo: 'PRE-2024-002',
-    sampleName: '水质加标样',
-    sampleType: 'SPIKE',
-    batchNo: 'B202402011',
-    prepareVolume: 500,
-    volumeUnit: 'mL',
-    concentration: 0.5,
-    unit: 'mg/L',
-    prepareMethod: '吸取2.5mL铜标准使用液(100μg/mL)于500mL容量瓶中,用纯水定容',
-    reagents: '铜标准使用液, 超纯水',
-    instruments: '大龙TopPette移液枪, A级容量瓶',
-    prepareBy: '张三',
-    verifyBy: '王五',
-    environment: '温度21℃, 湿度48%',
-    prepareTime: '2024-02-21 14:00:00'
-  }
-]
-
 const getSampleTypeText = (type) => {
   const map = {
     STANDARD: '标准样',
@@ -800,12 +678,21 @@ const getExpireStatusTag = (row) => {
   return map[status]
 }
 
-const fetchStats = () => {
-  const all = tableData.value.length
-  stats.total = all
-  stats.valid = tableData.value.filter(r => getExpireStatus(r) === 1).length
-  stats.warning = tableData.value.filter(r => getExpireStatus(r) === 2).length
-  stats.expired = tableData.value.filter(r => getExpireStatus(r) === 3).length
+const fetchStats = async () => {
+  try {
+    const res = await qualityControlApi.sampleStats()
+    if (res.data) {
+      stats.total = res.data.total || 0
+      stats.valid = res.data.valid || 0
+      stats.warning = res.data.warning || 0
+      stats.expired = res.data.expired || 0
+    }
+  } catch (error) {
+      stats.total = tableData.value.length
+      stats.valid = tableData.value.filter(r => getExpireStatus(r) === 1).length
+      stats.warning = tableData.value.filter(r => getExpireStatus(r) === 2).length
+      stats.expired = tableData.value.filter(r => getExpireStatus(r) === 3).length
+    }
 }
 
 const fetchList = async () => {
@@ -823,46 +710,15 @@ const fetchList = async () => {
       tableData.value = res.data.records
       pagination.total = res.data.total
     } else {
-      let data = [...mockSamples]
-      if (searchKeyword.value) {
-        data = data.filter(item =>
-          item.sampleName.includes(searchKeyword.value) ||
-          item.sampleNo.includes(searchKeyword.value) ||
-          item.batchNo.includes(searchKeyword.value)
-        )
-      }
-      if (searchType.value) {
-        data = data.filter(item => item.sampleType === searchType.value)
-      }
-      if (searchStatus.value) {
-        data = data.filter(item => getExpireStatus(item) === searchStatus.value)
-      }
-      pagination.total = data.length
-      const start = (pagination.pageNum - 1) * pagination.pageSize
-      const end = start + pagination.pageSize
-      tableData.value = data.slice(start, end)
+      tableData.value = []
+      pagination.total = 0
     }
-    fetchStats()
+    await fetchStats()
   } catch (error) {
-    let data = [...mockSamples]
-    if (searchKeyword.value) {
-      data = data.filter(item =>
-        item.sampleName.includes(searchKeyword.value) ||
-        item.sampleNo.includes(searchKeyword.value) ||
-        item.batchNo.includes(searchKeyword.value)
-      )
-    }
-    if (searchType.value) {
-      data = data.filter(item => item.sampleType === searchType.value)
-    }
-    if (searchStatus.value) {
-      data = data.filter(item => getExpireStatus(item) === searchStatus.value)
-    }
-    pagination.total = data.length
-    const start = (pagination.pageNum - 1) * pagination.pageSize
-    const end = start + pagination.pageSize
-    tableData.value = data.slice(start, end)
-    fetchStats()
+    console.error('获取样品列表失败', error)
+    ElMessage.error('获取样品列表失败')
+    tableData.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
@@ -881,30 +737,14 @@ const fetchPrepareList = async () => {
       prepareTableData.value = res.data.records
       preparePagination.total = res.data.total
     } else {
-      let data = [...mockPrepares]
-      if (prepareSearchKeyword.value) {
-        data = data.filter(item =>
-          item.sampleName.includes(prepareSearchKeyword.value) ||
-          item.prepareNo.includes(prepareSearchKeyword.value)
-        )
-      }
-      preparePagination.total = data.length
-      const start = (preparePagination.pageNum - 1) * preparePagination.pageSize
-      const end = start + preparePagination.pageSize
-      prepareTableData.value = data.slice(start, end)
+      prepareTableData.value = []
+      preparePagination.total = 0
     }
   } catch (error) {
-    let data = [...mockPrepares]
-    if (prepareSearchKeyword.value) {
-      data = data.filter(item =>
-        item.sampleName.includes(prepareSearchKeyword.value) ||
-        item.prepareNo.includes(prepareSearchKeyword.value)
-      )
-    }
-    preparePagination.total = data.length
-    const start = (preparePagination.pageNum - 1) * preparePagination.pageSize
-    const end = start + preparePagination.pageSize
-    prepareTableData.value = data.slice(start, end)
+    console.error('获取配制记录失败', error)
+    ElMessage.error('获取配制记录失败')
+    prepareTableData.value = []
+    preparePagination.total = 0
   } finally {
     prepareLoading.value = false
   }
@@ -966,9 +806,7 @@ const handleDelete = async (row) => {
     fetchList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      tableData.value = tableData.value.filter(item => item.id !== row.id)
-      ElMessage.success('删除成功')
-      fetchStats()
+      console.error('删除失败', error)
     }
   }
 }
@@ -987,22 +825,7 @@ const handleSubmit = async () => {
     fetchList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      if (sampleForm.id) {
-        const idx = tableData.value.findIndex(item => item.id === sampleForm.id)
-        if (idx > -1) {
-          tableData.value[idx] = { ...sampleForm }
-        }
-        ElMessage.success('更新成功')
-      } else {
-        tableData.value.unshift({
-          ...sampleForm,
-          id: Date.now(),
-          createTime: new Date().toLocaleString()
-        })
-        ElMessage.success('保存成功')
-      }
-      dialogVisible.value = false
-      fetchStats()
+      console.error('提交失败', error)
     }
   }
 }
@@ -1051,14 +874,7 @@ const handleSubmitPrepare = async () => {
     fetchPrepareList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      mockPrepares.unshift({
-        ...prepareForm,
-        id: Date.now(),
-        prepareTime: new Date().toLocaleString()
-      })
-      ElMessage.success('保存成功')
-      prepareDialogVisible.value = false
-      fetchPrepareList()
+      console.error('保存失败', error)
     }
   }
 }

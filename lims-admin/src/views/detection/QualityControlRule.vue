@@ -337,97 +337,14 @@ const formRules = {
   description: [{ required: true, message: '请输入规则描述', trigger: 'blur' }]
 }
 
-const defaultRules = [
-  {
-    ruleCode: '1_2s',
-    ruleName: '1-2s警告规则',
-    ruleType: 1,
-    description: '单个质控测定值超过均值±2SD，为警告规则，启动其他规则检查',
-    sdMultiple: 2,
-    consecutivePoints: 1,
-    withinRun: true,
-    acrossRun: false,
-    formula: '|x - mean| > 2 * SD',
-    enabled: 1
-  },
-  {
-    ruleCode: '1_3s',
-    ruleName: '1-3s失控规则',
-    ruleType: 2,
-    description: '单个质控测定值超过均值±3SD，为失控规则',
-    sdMultiple: 3,
-    consecutivePoints: 1,
-    withinRun: true,
-    acrossRun: false,
-    formula: '|x - mean| > 3 * SD',
-    enabled: 1
-  },
-  {
-    ruleCode: '2_2s',
-    ruleName: '2-2s失控规则',
-    ruleType: 2,
-    description: '两个连续的质控测定值同时超过均值+2SD或均值-2SD',
-    sdMultiple: 2,
-    consecutivePoints: 2,
-    withinRun: true,
-    acrossRun: true,
-    formula: '连续2个值 > mean + 2SD 或 < mean - 2SD',
-    enabled: 1
-  },
-  {
-    ruleCode: 'R_4s',
-    ruleName: 'R-4s失控规则',
-    ruleType: 2,
-    description: '同一批次内两个质控值的差超过4SD，其中一个超过+2SD，另一个超过-2SD',
-    sdMultiple: 4,
-    consecutivePoints: 2,
-    withinRun: true,
-    acrossRun: false,
-    formula: '|x1 - x2| > 4 * SD',
-    enabled: 1
-  },
-  {
-    ruleCode: '4_1s',
-    ruleName: '4-1s失控规则',
-    ruleType: 2,
-    description: '4个连续的质控测定值同时超过均值+1SD或均值-1SD',
-    sdMultiple: 1,
-    consecutivePoints: 4,
-    withinRun: false,
-    acrossRun: true,
-    formula: '连续4个值 > mean + 1SD 或 < mean - 1SD',
-    enabled: 1
-  },
-  {
-    ruleCode: '10_x',
-    ruleName: '10-x失控规则',
-    ruleType: 2,
-    description: '10个连续的质控测定值全部落在均值的同一侧',
-    sdMultiple: 0,
-    consecutivePoints: 10,
-    withinRun: false,
-    acrossRun: true,
-    formula: '连续10个值同时 > mean 或 < mean',
-    enabled: 1
-  }
-]
-
 const fetchStats = async () => {
   try {
     const res = await qualityControlApi.ruleStats()
     if (res.data) {
       Object.assign(stats, res.data)
-    } else {
-      stats.total = tableData.value.length
-      stats.enabled = tableData.value.filter(r => r.enabled === 1).length
-      stats.warning = tableData.value.filter(r => r.ruleType === 1).length
-      stats.reject = tableData.value.filter(r => r.ruleType === 2).length
     }
   } catch (error) {
-    stats.total = tableData.value.length
-    stats.enabled = tableData.value.filter(r => r.enabled === 1).length
-    stats.warning = tableData.value.filter(r => r.ruleType === 1).length
-    stats.reject = tableData.value.filter(r => r.ruleType === 2).length
+    console.error('获取统计数据失败', error)
   }
 }
 
@@ -444,47 +361,19 @@ const fetchList = async () => {
     if (res.data?.records) {
       tableData.value = res.data.records
       pagination.total = res.data.total
+    } else if (res.data?.list) {
+      tableData.value = res.data.list
+      pagination.total = res.data.total || res.data.list.length
     } else {
-      let data = [...defaultRules]
-      if (searchKeyword.value) {
-        data = data.filter(item => 
-          item.ruleName.includes(searchKeyword.value) || 
-          item.ruleCode.includes(searchKeyword.value)
-        )
-      }
-      if (searchType.value) {
-        data = data.filter(item => item.ruleType === searchType.value)
-      }
-      pagination.total = data.length
-      const start = (pagination.pageNum - 1) * pagination.pageSize
-      const end = start + pagination.pageSize
-      tableData.value = data.slice(start, end).map((item, idx) => ({
-        ...item,
-        id: idx + 1,
-        createTime: '2024-01-01 10:00:00'
-      }))
+      tableData.value = []
+      pagination.total = 0
     }
-    fetchStats()
+    await fetchStats()
   } catch (error) {
-    let data = [...defaultRules]
-    if (searchKeyword.value) {
-      data = data.filter(item => 
-        item.ruleName.includes(searchKeyword.value) || 
-        item.ruleCode.includes(searchKeyword.value)
-      )
-    }
-    if (searchType.value) {
-      data = data.filter(item => item.ruleType === searchType.value)
-    }
-    pagination.total = data.length
-    const start = (pagination.pageNum - 1) * pagination.pageSize
-    const end = start + pagination.pageSize
-    tableData.value = data.slice(start, end).map((item, idx) => ({
-      ...item,
-      id: idx + 1,
-      createTime: '2024-01-01 10:00:00'
-    }))
-    fetchStats()
+    console.error('获取规则列表失败', error)
+    ElMessage.error('获取规则列表失败')
+    tableData.value = []
+    pagination.total = 0
   } finally {
     loading.value = false
   }
@@ -536,11 +425,7 @@ const handleDelete = async (row) => {
     fetchList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      if (error?.message?.includes('404')) {
-        tableData.value = tableData.value.filter(item => item.id !== row.id)
-        ElMessage.success('删除成功')
-        fetchStats()
-      }
+      console.error('删除失败', error)
     }
   }
 }
@@ -551,7 +436,9 @@ const handleToggle = async (row) => {
     ElMessage.success(row.enabled === 1 ? '已启用' : '已禁用')
     fetchStats()
   } catch (error) {
-    fetchStats()
+    row.enabled = row.enabled === 1 ? 0 : 1
+    console.error('切换状态失败', error)
+    ElMessage.error('切换状态失败')
   }
 }
 
@@ -569,24 +456,7 @@ const handleSubmit = async () => {
     fetchList()
   } catch (error) {
     if (error !== 'cancel' && error !== false) {
-      if (error?.message?.includes('404')) {
-        if (ruleForm.id) {
-          const idx = tableData.value.findIndex(item => item.id === ruleForm.id)
-          if (idx > -1) {
-            tableData.value[idx] = { ...ruleForm }
-          }
-          ElMessage.success('更新成功')
-        } else {
-          tableData.value.unshift({
-            ...ruleForm,
-            id: Date.now(),
-            createTime: new Date().toLocaleString()
-          })
-          ElMessage.success('保存成功')
-        }
-        dialogVisible.value = false
-        fetchStats()
-      }
+      console.error('提交失败', error)
     }
   }
 }
