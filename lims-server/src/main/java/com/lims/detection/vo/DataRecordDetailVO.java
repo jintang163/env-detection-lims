@@ -1,0 +1,162 @@
+package com.lims.detection.vo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+@Data
+@ApiModel("检测数据详情VO")
+public class DataRecordDetailVO {
+
+    @ApiModelProperty("记录ID")
+    private Long id;
+
+    @ApiModelProperty("记录编号")
+    private String recordNo;
+
+    @ApiModelProperty("检测任务ID")
+    private Long taskId;
+
+    @ApiModelProperty("任务编号")
+    private String taskNo;
+
+    @ApiModelProperty("样品ID")
+    private Long sampleId;
+
+    @ApiModelProperty("样品编号")
+    private String sampleNo;
+
+    @ApiModelProperty("样品名称")
+    private String sampleName;
+
+    @ApiModelProperty("委托单ID")
+    private Long entrustId;
+
+    @ApiModelProperty("委托单编号")
+    private String entrustNo;
+
+    @ApiModelProperty("标准方法ID")
+    private Long methodId;
+
+    @ApiModelProperty("标准方法编号")
+    private String methodCode;
+
+    @ApiModelProperty("标准方法名称")
+    private String methodName;
+
+    @ApiModelProperty("使用设备ID列表")
+    private List<Long> equipmentIdList;
+
+    @ApiModelProperty("使用设备名称列表")
+    private List<String> equipmentNameList;
+
+    @ApiModelProperty("标准物质ID列表")
+    private List<Long> standardSubstanceIdList;
+
+    @ApiModelProperty("标准物质名称列表")
+    private List<String> standardSubstanceNameList;
+
+    @ApiModelProperty("检测日期")
+    private LocalDate testDate;
+
+    @ApiModelProperty("检测时间")
+    private LocalTime testTime;
+
+    @ApiModelProperty("检测环境条件")
+    private String testEnv;
+
+    @ApiModelProperty("数据来源 1手动录入 2仪器导入 3文件导入")
+    private Integer dataSource;
+
+    @ApiModelProperty("数据来源名称")
+    private String dataSourceName;
+
+    @ApiModelProperty("导入文件地址")
+    private String importFileUrl;
+
+    @ApiModelProperty("导入文件名称")
+    private String importFileName;
+
+    @ApiModelProperty("录入人ID")
+    private Long entryUserId;
+
+    @ApiModelProperty("录入人姓名")
+    private String entryUserName;
+
+    @ApiModelProperty("录入时间")
+    private LocalDateTime entryTime;
+
+    @ApiModelProperty("一级审核人ID")
+    private Long firstReviewUserId;
+
+    @ApiModelProperty("一级审核人姓名")
+    private String firstReviewUserName;
+
+    @ApiModelProperty("一级审核时间")
+    private LocalDateTime firstReviewTime;
+
+    @ApiModelProperty("一级审核意见")
+    private String firstReviewOpinion;
+
+    @ApiModelProperty("一级审核结果 1通过 2驳回")
+    private Integer firstReviewResult;
+
+    @ApiModelProperty("二级审核人ID")
+    private Long secondReviewUserId;
+
+    @ApiModelProperty("二级审核人姓名")
+    private String secondReviewUserName;
+
+    @ApiModelProperty("二级审核时间")
+    private LocalDateTime secondReviewTime;
+
+    @ApiModelProperty("二级审核意见")
+    private String secondReviewOpinion;
+
+    @ApiModelProperty("二级审核结果 1通过 2驳回")
+    private Integer secondReviewResult;
+
+    @ApiModelProperty("审核状态 0待审核 1一级审核中 2一级审核通过 3一级审核驳回 4二级审核中 5二级审核通过 6二级审核驳回")
+    private Integer reviewStatus;
+
+    @ApiModelProperty("审核状态名称")
+    private String reviewStatusName;
+
+    @ApiModelProperty("是否有OOS 0否 1是")
+    private Integer hasOos;
+
+    @ApiModelProperty("OOS数量")
+    private Integer oosCount;
+
+    @ApiModelProperty("状态 0草稿 1已录入 2审核中 3已完成 4已退回")
+    private Integer status;
+
+    @ApiModelProperty("状态名称")
+    private String statusName;
+
+    @ApiModelProperty("版本号")
+    private Integer version;
+
+    @ApiModelProperty("检测数据明细列表")
+    private List<DataRecordItemVO> itemList;
+
+    @ApiModelProperty("审核记录列表")
+    private List<DataReviewVO> reviewList;
+
+    @ApiModelProperty("OOS记录列表")
+    private List<OosRecordVO> oosList;
+
+    @ApiModelProperty("备注")
+    private String remark;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
+
+    @ApiModelProperty("更新时间")
+    private LocalDateTime updateTime;
+}

@@ -26,6 +26,9 @@ public class CodeGenerator {
     private static final AtomicInteger standardMethodSeq = new AtomicInteger(1);
     private static final AtomicInteger schedulePlanSeq = new AtomicInteger(1);
     private static final AtomicInteger userQualificationSeq = new AtomicInteger(1);
+    private static final AtomicInteger dataRecordSeq = new AtomicInteger(1);
+    private static final AtomicInteger originalRecordSeq = new AtomicInteger(1);
+    private static final AtomicInteger oosRecordSeq = new AtomicInteger(1);
 
     private static final String PREFIX_CUSTOMER = "CUS";
     private static final String PREFIX_CONTRACT = "CON";
@@ -44,6 +47,9 @@ public class CodeGenerator {
     private static final String PREFIX_STANDARD_METHOD = "SM";
     private static final String PREFIX_SCHEDULE_PLAN = "SPL";
     private static final String PREFIX_USER_QUALIFICATION = "UQ";
+    private static final String PREFIX_DATA_RECORD = "DR";
+    private static final String PREFIX_ORIGINAL_RECORD = "OR";
+    private static final String PREFIX_OOS_RECORD = "OOS";
 
     public String generateCustomerNo() {
         return generateCode(PREFIX_CUSTOMER, customerSeq);
@@ -111,6 +117,18 @@ public class CodeGenerator {
 
     public String generateUserQualificationNo() {
         return generateCode(PREFIX_USER_QUALIFICATION, userQualificationSeq);
+    }
+
+    public String generateDataRecordNo() {
+        return generateCode(PREFIX_DATA_RECORD, dataRecordSeq);
+    }
+
+    public String generateOriginalRecordNo() {
+        return generateCode(PREFIX_ORIGINAL_RECORD, originalRecordSeq);
+    }
+
+    public String generateOosRecordNo() {
+        return generateCode(PREFIX_OOS_RECORD, oosRecordSeq);
     }
 
     private String generateCode(String prefix, AtomicInteger seq) {
