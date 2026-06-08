@@ -160,6 +160,24 @@ const routes = [
     name: 'CertificateWarning',
     component: () => import('@/views/personnel/CertificateWarning.vue'),
     meta: { title: '证书到期预警' }
+  },
+  {
+    path: '/environment/monitor',
+    name: 'EnvironmentMonitor',
+    component: () => import('@/views/environment/EnvironmentMonitor.vue'),
+    meta: { title: '环境监控' }
+  },
+  {
+    path: '/environment/facility',
+    name: 'FacilityLedger',
+    component: () => import('@/views/environment/FacilityLedger.vue'),
+    meta: { title: '设施台账' }
+  },
+  {
+    path: '/environment/maintenance',
+    name: 'FacilityMaintenance',
+    component: () => import('@/views/environment/FacilityMaintenance.vue'),
+    meta: { title: '设施维护' }
   }
 ]
 

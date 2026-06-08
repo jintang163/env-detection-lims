@@ -1,0 +1,9 @@
+package com.lims.environment.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.lims.environment.entity.EnvWarningRecord;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface EnvWarningRecordMapper extends BaseMapper<EnvWarningRecord> {
+}
