@@ -1,0 +1,80 @@
+package com.lims.equipment.vo;
+
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Data
+@ApiModel("设备列表VO")
+public class EquipmentVO {
+
+    @ApiModelProperty("主键ID")
+    private Long id;
+
+    @ApiModelProperty("设备编号")
+    private String equipmentNo;
+
+    @ApiModelProperty("设备名称")
+    private String equipmentName;
+
+    @ApiModelProperty("设备型号")
+    private String model;
+
+    @ApiModelProperty("设备规格")
+    private String specification;
+
+    @ApiModelProperty("设备类型")
+    private String equipmentType;
+
+    @ApiModelProperty("所属部门ID")
+    private Long deptId;
+
+    @ApiModelProperty("所属部门名称")
+    private String deptName;
+
+    @ApiModelProperty("存放地点")
+    private String location;
+
+    @ApiModelProperty("供应商ID")
+    private Long supplierId;
+
+    @ApiModelProperty("供应商名称")
+    private String supplierName;
+
+    @ApiModelProperty("购置日期")
+    private LocalDate purchaseDate;
+
+    @ApiModelProperty("购置金额")
+    private BigDecimal purchaseAmount;
+
+    @ApiModelProperty("出厂编号")
+    private String factoryNo;
+
+    @ApiModelProperty("设备状态：0闲置 1在用 2维修中 3停用 4报废")
+    private Integer status;
+
+    @ApiModelProperty("设备状态名称")
+    private String statusName;
+
+    @ApiModelProperty("管理员ID")
+    private Long managerId;
+
+    @ApiModelProperty("管理员名称")
+    private String managerName;
+
+    @ApiModelProperty("技术参数")
+    private String technicalParams;
+
+    @ApiModelProperty("备注")
+    private String remark;
+
+    @ApiModelProperty("附件")
+    private String attachments;
+
+    @ApiModelProperty("创建时间")
+    private LocalDateTime createTime;
+}
