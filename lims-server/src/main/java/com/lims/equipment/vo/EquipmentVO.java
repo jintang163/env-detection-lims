@@ -69,6 +69,30 @@ public class EquipmentVO {
     @ApiModelProperty("技术参数")
     private String technicalParams;
 
+    @ApiModelProperty("生产厂家")
+    private String manufacturer;
+
+    @ApiModelProperty("上次校准日期")
+    private LocalDate lastCalibrationDate;
+
+    @ApiModelProperty("下次校准日期")
+    private LocalDate nextCalibrationDate;
+
+    @ApiModelProperty("校准周期(天)")
+    private Integer calibrationCycle;
+
+    @ApiModelProperty("领用状态 0未领用 1已领用")
+    private Integer borrowStatus;
+
+    @ApiModelProperty("当前借用人ID")
+    private Long currentBorrowerId;
+
+    @ApiModelProperty("当前借用人姓名")
+    private String currentBorrowerName;
+
+    @ApiModelProperty("存放位置")
+    private String storageLocation;
+
     @ApiModelProperty("备注")
     private String remark;
 

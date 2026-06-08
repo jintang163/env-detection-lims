@@ -118,6 +118,30 @@ const routes = [
     name: 'ConsumableManagement',
     component: () => import('@/views/reagent/ConsumableManagement.vue'),
     meta: { title: '耗材管理' }
+  },
+  {
+    path: '/equipment/ledger',
+    name: 'EquipmentLedger',
+    component: () => import('@/views/equipment/EquipmentLedger.vue'),
+    meta: { title: '设备台账' }
+  },
+  {
+    path: '/equipment/usage',
+    name: 'EquipmentUsage',
+    component: () => import('@/views/equipment/EquipmentUsage.vue'),
+    meta: { title: '设备使用记录' }
+  },
+  {
+    path: '/equipment/calibration',
+    name: 'CalibrationManagement',
+    component: () => import('@/views/equipment/CalibrationManagement.vue'),
+    meta: { title: '校准管理' }
+  },
+  {
+    path: '/equipment/maintenance',
+    name: 'MaintenanceManagement',
+    component: () => import('@/views/equipment/MaintenanceManagement.vue'),
+    meta: { title: '设备维护/维修管理' }
   }
 ]
 

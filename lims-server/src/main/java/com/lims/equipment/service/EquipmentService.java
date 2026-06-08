@@ -25,4 +25,6 @@ public interface EquipmentService extends IService<EqEquipment> {
     List<EquipmentVO> getAvailableEquipmentList();
 
     void updateEquipmentStatus(Long id, Integer status);
+
+    java.util.Map<String, Object> getStats();
 }

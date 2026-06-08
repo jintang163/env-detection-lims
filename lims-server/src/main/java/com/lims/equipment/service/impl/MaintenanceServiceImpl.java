@@ -386,14 +386,23 @@ public class MaintenanceServiceImpl extends ServiceImpl<EqMaintenanceRecordMappe
         if (request == null) {
             throw new BizException("维修申请不存在");
         }
-        if (request.getStatus() != REPAIR_STATUS_PENDING) {
-            throw new BizException("只能驳回待受理状态的申请");
+        if (request.getStatus() != REPAIR_STATUS_PENDING && request.getStatus() != REPAIR_STATUS_REPAIRING) {
+            throw new BizException("只能驳回待受理或维修中状态的申请");
         }
 
+        Integer oldStatus = request.getStatus();
         request.setStatus(REPAIR_STATUS_REJECTED);
         request.setRemark(reason);
         request.setHandleTime(LocalDateTime.now());
         repairRequestMapper.updateById(request);
+
+        if (oldStatus == REPAIR_STATUS_REPAIRING) {
+            EqEquipment equipment = equipmentMapper.selectById(request.getEquipmentId());
+            if (equipment != null && equipment.getStatus() == EQUIPMENT_STATUS_REPAIRING) {
+                equipment.setStatus(EQUIPMENT_STATUS_IDLE);
+                equipmentMapper.updateById(equipment);
+            }
+        }
     }
 
     @Override

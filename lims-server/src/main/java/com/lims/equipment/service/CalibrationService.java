@@ -40,4 +40,6 @@ public interface CalibrationService extends IService<EqCalibrationPlan> {
     void checkAndUpdatePlanStatus();
 
     List<CalibrationRecordVO> getRecordsByEquipmentId(Long equipmentId);
+
+    List<CalibrationPlanVO> getPlansByEquipmentId(Long equipmentId);
 }

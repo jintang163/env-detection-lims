@@ -269,7 +269,7 @@ public class DataTraceServiceImpl extends ServiceImpl<DetDataTraceMapper, DetDat
                     Long equipmentId = equipmentIds.get(i);
                     String equipmentName = i < equipmentNames.size() ? equipmentNames.get(i) : null;
 
-                    SmpEquipment equipment = equipmentMapper.selectById(equipmentId);
+                    EqEquipment equipment = equipmentMapper.selectById(equipmentId);
                     if (equipment != null) {
                         addTraceRelation(NODE_TYPE_EQUIPMENT,
                                 equipment.getId(), NODE_TYPE_EQUIPMENT,

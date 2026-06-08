@@ -39,4 +39,7 @@ public class CalibrationPlanQuery extends PageQuery {
 
     @ApiModelProperty("是否即将到期")
     private Boolean upcoming;
+
+    @ApiModelProperty("提醒天数")
+    private Integer remindDays;
 }

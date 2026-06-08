@@ -7,6 +7,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @ApiModel("设备详情VO")
@@ -86,4 +87,43 @@ public class EquipmentDetailVO {
 
     @ApiModelProperty("更新时间")
     private LocalDateTime updateTime;
+
+    @ApiModelProperty("生产厂家")
+    private String manufacturer;
+
+    @ApiModelProperty("上次校准日期")
+    private LocalDate lastCalibrationDate;
+
+    @ApiModelProperty("下次校准日期")
+    private LocalDate nextCalibrationDate;
+
+    @ApiModelProperty("校准周期(天)")
+    private Integer calibrationCycle;
+
+    @ApiModelProperty("领用状态 0未领用 1已领用")
+    private Integer borrowStatus;
+
+    @ApiModelProperty("当前借用人ID")
+    private Long currentBorrowerId;
+
+    @ApiModelProperty("当前借用人姓名")
+    private String currentBorrowerName;
+
+    @ApiModelProperty("存放位置")
+    private String storageLocation;
+
+    @ApiModelProperty("校准计划列表")
+    private List<CalibrationPlanVO> calibrationPlans;
+
+    @ApiModelProperty("校准记录列表")
+    private List<CalibrationRecordVO> calibrationRecords;
+
+    @ApiModelProperty("使用记录列表")
+    private List<EquipmentUsageVO> usageRecords;
+
+    @ApiModelProperty("维护记录列表")
+    private List<MaintenanceRecordVO> maintenanceRecords;
+
+    @ApiModelProperty("维修申请列表")
+    private List<RepairRequestVO> repairRequests;
 }

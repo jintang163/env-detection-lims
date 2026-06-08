@@ -10,19 +10,65 @@ import com.lims.common.exception.BizException;
 import com.lims.common.page.PageResult;
 import com.lims.equipment.dto.EquipmentQuery;
 import com.lims.equipment.dto.EquipmentSaveDTO;
+import com.lims.equipment.entity.EqCalibrationPlan;
+import com.lims.equipment.entity.EqCalibrationRecord;
 import com.lims.equipment.entity.EqEquipment;
+import com.lims.equipment.entity.EqEquipmentUsage;
+import com.lims.equipment.entity.EqMaintenanceRecord;
+import com.lims.equipment.entity.EqRepairRequest;
+import com.lims.equipment.mapper.EqCalibrationPlanMapper;
+import com.lims.equipment.mapper.EqCalibrationRecordMapper;
 import com.lims.equipment.mapper.EqEquipmentMapper;
+import com.lims.equipment.mapper.EqEquipmentUsageMapper;
+import com.lims.equipment.mapper.EqMaintenanceRecordMapper;
+import com.lims.equipment.mapper.EqRepairRequestMapper;
+import com.lims.equipment.service.CalibrationService;
 import com.lims.equipment.service.EquipmentService;
+import com.lims.equipment.service.EquipmentUsageService;
+import com.lims.equipment.service.MaintenanceService;
+import com.lims.equipment.vo.CalibrationPlanVO;
+import com.lims.equipment.vo.CalibrationRecordVO;
 import com.lims.equipment.vo.EquipmentDetailVO;
+import com.lims.equipment.vo.EquipmentUsageVO;
 import com.lims.equipment.vo.EquipmentVO;
+import com.lims.equipment.vo.MaintenanceRecordVO;
+import com.lims.equipment.vo.RepairRequestVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class EquipmentServiceImpl extends ServiceImpl<EqEquipmentMapper, EqEquipment> implements EquipmentService {
+
+    @Autowired
+    private EqCalibrationPlanMapper calibrationPlanMapper;
+
+    @Autowired
+    private EqCalibrationRecordMapper calibrationRecordMapper;
+
+    @Autowired
+    private EqEquipmentUsageMapper equipmentUsageMapper;
+
+    @Autowired
+    private EqMaintenanceRecordMapper maintenanceRecordMapper;
+
+    @Autowired
+    private EqRepairRequestMapper repairRequestMapper;
+
+    @Autowired
+    private CalibrationService calibrationService;
+
+    @Autowired
+    private EquipmentUsageService equipmentUsageService;
+
+    @Autowired
+    private MaintenanceService maintenanceService;
 
     private static final int STATUS_IDLE = 0;
     private static final int STATUS_IN_USE = 1;
@@ -139,6 +185,19 @@ public class EquipmentServiceImpl extends ServiceImpl<EqEquipmentMapper, EqEquip
         }
         EquipmentDetailVO vo = BeanUtil.copyProperties(equipment, EquipmentDetailVO.class);
         vo.setStatusName(getStatusName(equipment.getStatus()));
+
+        List<CalibrationPlanVO> calibrationPlans = calibrationService.getPlansByEquipmentId(id);
+        List<CalibrationRecordVO> calibrationRecords = calibrationService.getRecordsByEquipmentId(id);
+        List<EquipmentUsageVO> usageRecords = equipmentUsageService.getUsageByEquipmentId(id);
+        List<MaintenanceRecordVO> maintenanceRecords = maintenanceService.getMaintenanceByEquipmentId(id);
+        List<RepairRequestVO> repairRequests = maintenanceService.getRepairByEquipmentId(id);
+
+        vo.setCalibrationPlans(calibrationPlans);
+        vo.setCalibrationRecords(calibrationRecords);
+        vo.setUsageRecords(usageRecords);
+        vo.setMaintenanceRecords(maintenanceRecords);
+        vo.setRepairRequests(repairRequests);
+
         return vo;
     }
 
@@ -164,5 +223,29 @@ public class EquipmentServiceImpl extends ServiceImpl<EqEquipmentMapper, EqEquip
         }
         equipment.setStatus(status);
         this.updateById(equipment);
+    }
+
+    @Override
+    public Map<String, Object> getStats() {
+        Map<String, Object> stats = new HashMap<>();
+        LambdaQueryWrapper<EqEquipment> wrapper;
+
+        wrapper = new LambdaQueryWrapper<>();
+        stats.put("total", this.count(wrapper));
+
+        wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EqEquipment::getStatus, STATUS_IN_USE);
+        stats.put("inUse", this.count(wrapper));
+
+        wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EqEquipment::getStatus, STATUS_REPAIRING);
+        stats.put("repairing", this.count(wrapper));
+
+        wrapper = new LambdaQueryWrapper<>();
+        wrapper.le(EqEquipment::getNextCalibrationDate, LocalDate.now().plusDays(30));
+        wrapper.ge(EqEquipment::getNextCalibrationDate, LocalDate.now());
+        stats.put("needCalibration", this.count(wrapper));
+
+        return stats;
     }
 }

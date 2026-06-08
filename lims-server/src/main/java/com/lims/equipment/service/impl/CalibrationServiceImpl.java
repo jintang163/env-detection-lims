@@ -50,6 +50,8 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
     private static final int RESULT_FAIL = 2;
     private static final int RESULT_PARTIAL = 3;
 
+    private static final int DEFAULT_REMIND_DAYS = 30;
+
     private String getCalibrationTypeName(Integer type) {
         if (type == null) return "";
         switch (type) {
@@ -90,7 +92,7 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
         vo.setStatusName(getPlanStatusName(entity.getStatus()));
         long days = calculateDaysUntilDue(entity.getNextCalibrationDate());
         vo.setDaysUntilDue(days);
-        Integer remindDays = entity.getRemindDays() != null ? entity.getRemindDays() : 30;
+        Integer remindDays = entity.getRemindDays() != null ? entity.getRemindDays() : DEFAULT_REMIND_DAYS;
         vo.setUpcoming(days <= remindDays && days >= 0);
         return vo;
     }
@@ -131,7 +133,8 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
         }
         if (Boolean.TRUE.equals(query.getUpcoming())) {
             LocalDate today = LocalDate.now();
-            wrapper.le(EqCalibrationPlan::getNextCalibrationDate, today.plusDays(30));
+            Integer remindDays = query.getRemindDays() != null ? query.getRemindDays() : DEFAULT_REMIND_DAYS;
+            wrapper.le(EqCalibrationPlan::getNextCalibrationDate, today.plusDays(remindDays));
             wrapper.ge(EqCalibrationPlan::getNextCalibrationDate, today);
             wrapper.eq(EqCalibrationPlan::getStatus, STATUS_PENDING);
         }
@@ -157,7 +160,7 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
             plan.setStatus(STATUS_PENDING);
         }
         if (plan.getRemindDays() == null) {
-            plan.setRemindDays(30);
+            plan.setRemindDays(DEFAULT_REMIND_DAYS);
         }
         this.save(plan);
     }
@@ -246,18 +249,26 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
         EqCalibrationRecord record = BeanUtil.copyProperties(dto, EqCalibrationRecord.class);
         calibrationRecordMapper.insert(record);
 
+        equipment.setLastCalibrationDate(dto.getCalibrationDate());
+        if (dto.getValidUntil() != null) {
+            equipment.setNextCalibrationDate(dto.getValidUntil());
+        }
+
         if (dto.getPlanId() != null) {
             EqCalibrationPlan plan = this.getById(dto.getPlanId());
             if (plan != null) {
                 plan.setStatus(STATUS_COMPLETED);
                 plan.setLastCalibrationDate(dto.getCalibrationDate());
                 if (plan.getCycleMonths() != null && plan.getCycleMonths() > 0) {
-                    plan.setNextCalibrationDate(dto.getCalibrationDate().plusMonths(plan.getCycleMonths()));
+                    LocalDate nextDate = dto.getCalibrationDate().plusMonths(plan.getCycleMonths());
+                    plan.setNextCalibrationDate(nextDate);
                     plan.setStatus(STATUS_PENDING);
+                    equipment.setNextCalibrationDate(nextDate);
                 }
                 this.updateById(plan);
             }
         }
+        equipmentMapper.updateById(equipment);
     }
 
     @Override
@@ -296,7 +307,7 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
     @Override
     public List<CalibrationPlanVO> getUpcomingCalibrations() {
         LocalDate today = LocalDate.now();
-        LocalDate remindDate = today.plusDays(30);
+        LocalDate remindDate = today.plusDays(DEFAULT_REMIND_DAYS);
         LambdaQueryWrapper<EqCalibrationPlan> wrapper = new LambdaQueryWrapper<>();
         wrapper.le(EqCalibrationPlan::getNextCalibrationDate, remindDate);
         wrapper.ge(EqCalibrationPlan::getNextCalibrationDate, today);
@@ -329,5 +340,14 @@ public class CalibrationServiceImpl extends ServiceImpl<EqCalibrationPlanMapper,
         wrapper.orderByDesc(EqCalibrationRecord::getCalibrationDate);
         List<EqCalibrationRecord> list = calibrationRecordMapper.selectList(wrapper);
         return list.stream().map(this::convertRecordToVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CalibrationPlanVO> getPlansByEquipmentId(Long equipmentId) {
+        LambdaQueryWrapper<EqCalibrationPlan> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(EqCalibrationPlan::getEquipmentId, equipmentId);
+        wrapper.orderByDesc(EqCalibrationPlan::getNextCalibrationDate);
+        List<EqCalibrationPlan> list = this.list(wrapper);
+        return list.stream().map(this::convertPlanToVO).collect(Collectors.toList());
     }
 }

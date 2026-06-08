@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "设备台账管理")
 @RestController
@@ -71,9 +72,15 @@ public class EquipmentController {
     }
 
     @ApiOperation("更新设备状态")
-    @PutMapping("/status")
-    public Result<Void> updateEquipmentStatus(@RequestParam Long id, @RequestParam Integer status) {
+    @PutMapping("/{id}/status")
+    public Result<Void> updateEquipmentStatus(@PathVariable Long id, @RequestParam Integer status) {
         equipmentService.updateEquipmentStatus(id, status);
         return Result.success();
+    }
+
+    @ApiOperation("获取设备统计信息")
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> getStats() {
+        return Result.success(equipmentService.getStats());
     }
 }
