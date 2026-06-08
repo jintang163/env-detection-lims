@@ -29,6 +29,8 @@ public class CodeGenerator {
     private static final AtomicInteger dataRecordSeq = new AtomicInteger(1);
     private static final AtomicInteger originalRecordSeq = new AtomicInteger(1);
     private static final AtomicInteger oosRecordSeq = new AtomicInteger(1);
+    private static final AtomicInteger trainingPlanSeq = new AtomicInteger(1);
+    private static final AtomicInteger employeeSeq = new AtomicInteger(1);
 
     private static final String PREFIX_CUSTOMER = "CUS";
     private static final String PREFIX_CONTRACT = "CON";
@@ -50,6 +52,8 @@ public class CodeGenerator {
     private static final String PREFIX_DATA_RECORD = "DR";
     private static final String PREFIX_ORIGINAL_RECORD = "OR";
     private static final String PREFIX_OOS_RECORD = "OOS";
+    private static final String PREFIX_TRAINING_PLAN = "TP";
+    private static final String PREFIX_EMPLOYEE = "EMP";
 
     public String generateCustomerNo() {
         return generateCode(PREFIX_CUSTOMER, customerSeq);
@@ -131,6 +135,14 @@ public class CodeGenerator {
         return generateCode(PREFIX_OOS_RECORD, oosRecordSeq);
     }
 
+    public String generateTrainingPlanNo() {
+        return generateTrainingPlanCode(PREFIX_TRAINING_PLAN, trainingPlanSeq);
+    }
+
+    public String generateEmployeeNo() {
+        return generateCode(PREFIX_EMPLOYEE, employeeSeq);
+    }
+
     private String generateCode(String prefix, AtomicInteger seq) {
         String datePart = DateUtil.format(new Date(), "yyyyMMdd");
         int sequence = seq.getAndIncrement();
@@ -139,5 +151,15 @@ public class CodeGenerator {
             sequence = 1;
         }
         return String.format("%s%s%04d", prefix, datePart, sequence);
+    }
+
+    private String generateTrainingPlanCode(String prefix, AtomicInteger seq) {
+        String yearPart = DateUtil.format(new Date(), "yyyy");
+        int sequence = seq.getAndIncrement();
+        if (sequence > 9999) {
+            seq.set(1);
+            sequence = 1;
+        }
+        return String.format("%s%s%04d", prefix, yearPart, sequence);
     }
 }

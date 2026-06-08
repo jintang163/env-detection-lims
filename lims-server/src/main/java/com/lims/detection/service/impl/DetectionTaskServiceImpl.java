@@ -20,6 +20,8 @@ import com.lims.detection.mapper.*;
 import com.lims.detection.service.DetectionTaskService;
 import com.lims.detection.vo.*;
 import com.lims.detection.websocket.DetectionTaskWebSocketHandler;
+import com.lims.personnel.entity.PerPersonnelAuthorization;
+import com.lims.personnel.mapper.PerPersonnelAuthorizationMapper;
 import com.lims.security.utils.SecurityUtils;
 import com.lims.system.entity.SysDept;
 import com.lims.system.entity.SysUser;
@@ -53,6 +55,9 @@ public class DetectionTaskServiceImpl extends ServiceImpl<DetDetectionTaskMapper
 
     @Autowired
     private DetUserQualificationMapper userQualificationMapper;
+
+    @Autowired
+    private PerPersonnelAuthorizationMapper personnelAuthorizationMapper;
 
     @Autowired
     private SysUserMapper userMapper;
@@ -356,6 +361,10 @@ public class DetectionTaskServiceImpl extends ServiceImpl<DetDetectionTaskMapper
             }
             if (task.getStatus() != STATUS_PENDING_ASSIGN && task.getStatus() != STATUS_PAUSED) {
                 throw new BizException("任务状态不正确，不能分配，任务编号: " + task.getTaskNo());
+            }
+
+            if (dto.getAssigneeId() != null && dto.getAssigneeType() == 1) {
+                checkPersonnelQualification(dto.getAssigneeId(), dto.getAssigneeName(), task);
             }
 
             DetTaskAssignment assignment = new DetTaskAssignment();
@@ -995,4 +1004,76 @@ public class DetectionTaskServiceImpl extends ServiceImpl<DetDetectionTaskMapper
             equipmentUsageMapper.updateById(usage);
         }
     }
+
+    private void checkPersonnelQualification(Long assigneeId, String assigneeName, DetDetectionTask task) {
+        if (StrUtil.isBlank(task.getTestItemIds())) {
+            return;
+        }
+
+        try {
+            List<Long> taskItemIds = objectMapper.readValue(task.getTestItemIds(), List.class);
+            if (taskItemIds.isEmpty()) {
+                return;
+            }
+
+            LocalDate today = LocalDate.now();
+            List<PerPersonnelAuthorization> authorizations = personnelAuthorizationMapper.selectList(
+                    new LambdaQueryWrapper<PerPersonnelAuthorization>()
+                            .eq(PerPersonnelAuthorization::getPersonnelId, assigneeId)
+                            .eq(PerPersonnelAuthorization::getStatus, 1)
+                            .ge(PerPersonnelAuthorization::getExpiryDate, today)
+            );
+
+            Set<Long> authorizedItemIds = authorizations.stream()
+                    .map(PerPersonnelAuthorization::getItemId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+
+            List<Long> unauthorizedItems = new ArrayList<>();
+            for (Long itemId : taskItemIds) {
+                if (!authorizedItemIds.contains(itemId)) {
+                    unauthorizedItems.add(itemId);
+                }
+            }
+
+            if (!unauthorizedItems.isEmpty()) {
+                try {
+                    List<String> taskItemNames = StrUtil.isNotBlank(task.getTestItemNames())
+                            ? objectMapper.readValue(task.getTestItemNames(), List.class)
+                            : Collections.emptyList();
+
+                    List<String> unauthorizedItemNames = new ArrayList<>();
+                    for (int i = 0; i < taskItemIds.size(); i++) {
+                        if (unauthorizedItems.contains(taskItemIds.get(i))) {
+                            if (i < taskItemNames.size()) {
+                                unauthorizedItemNames.add(taskItemNames.get(i));
+                            } else {
+                                unauthorizedItemNames.add("项目ID:" + taskItemIds.get(i));
+                            }
+                        }
+                    }
+
+                    String errorMsg = String.format("人员【%s】无以下检测项目的授权：%s，无法分配该任务。",
+                            assigneeName, String.join("、", unauthorizedItemNames));
+                    throw new BizException(errorMsg);
+                } catch (JsonProcessingException e) {
+                    throw new BizException("解析检测项目名称失败");
+                }
+            }
+
+            for (PerPersonnelAuthorization auth : authorizations) {
+                if (auth.getExpiryDate() != null) {
+                    long daysUntilExpiry = java.time.temporal.ChronoUnit.DAYS.between(today, auth.getExpiryDate());
+                    if (daysUntilExpiry <= 30) {
+                        log.warn("人员【{}】的授权【{}】将在 {} 天后到期，请及时处理。",
+                                assigneeName, auth.getItemName(), daysUntilExpiry);
+                    }
+                }
+            }
+        } catch (JsonProcessingException e) {
+            throw new BizException("解析检测项目ID列表失败");
+        }
+    }
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DetectionTaskServiceImpl.class);
 }

@@ -142,6 +142,24 @@ const routes = [
     name: 'MaintenanceManagement',
     component: () => import('@/views/equipment/MaintenanceManagement.vue'),
     meta: { title: '设备维护/维修管理' }
+  },
+  {
+    path: '/personnel/ledger',
+    name: 'PersonnelLedger',
+    component: () => import('@/views/personnel/PersonnelLedger.vue'),
+    meta: { title: '人员档案' }
+  },
+  {
+    path: '/personnel/training',
+    name: 'TrainingManagement',
+    component: () => import('@/views/personnel/TrainingManagement.vue'),
+    meta: { title: '培训管理' }
+  },
+  {
+    path: '/personnel/certificateWarning',
+    name: 'CertificateWarning',
+    component: () => import('@/views/personnel/CertificateWarning.vue'),
+    meta: { title: '证书到期预警' }
   }
 ]
 
