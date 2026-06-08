@@ -343,7 +343,7 @@
           </el-button>
         </div>
         <el-table :data="detailData.educationList || []" border stripe style="width: 100%; margin-top: 12px">
-          <el-table-column prop="school" label="学校" width="180" />
+          <el-table-column prop="graduationSchool" label="毕业院校" width="180" />
           <el-table-column prop="major" label="专业" width="160" />
           <el-table-column prop="education" label="学历" width="100" />
           <el-table-column prop="degree" label="学位" width="100" />
@@ -370,8 +370,8 @@
           <el-table-column prop="titleName" label="职称名称" width="160" />
           <el-table-column prop="titleLevel" label="职称级别" width="120" />
           <el-table-column prop="certificateNo" label="证书编号" width="160" />
-          <el-table-column prop="grantDate" label="授予日期" width="120" />
-          <el-table-column prop="grantOrg" label="授予单位" width="180" />
+          <el-table-column prop="acquireDate" label="取得日期" width="120" />
+          <el-table-column prop="grantingAuthority" label="授予机构" width="180" />
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
               <el-button type="primary" link size="small" @click="handleEditTitle(row)">编辑</el-button>
@@ -389,11 +389,12 @@
           </el-button>
         </div>
         <el-table :data="detailData.authorizationList || []" border stripe style="width: 100%; margin-top: 12px">
-          <el-table-column prop="testItem" label="检测项目" width="180" />
-          <el-table-column prop="testStandard" label="检测标准" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="testMethod" label="检测方法" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="validStartDate" label="授权开始日期" width="140" />
-          <el-table-column prop="validEndDate" label="授权结束日期" width="140" />
+          <el-table-column prop="authorizationType" label="授权类型" width="140" />
+          <el-table-column prop="itemName" label="检测项目" width="160" />
+          <el-table-column prop="standardName" label="检测标准" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="methodName" label="检测方法" min-width="160" show-overflow-tooltip />
+          <el-table-column prop="authorizeDate" label="授权日期" width="120" />
+          <el-table-column prop="expiryDate" label="有效期至" width="120" />
           <el-table-column label="状态" width="100">
             <template #default="{ row }">
               <el-tag :type="row.status === 1 ? 'success' : 'info'" effect="light" size="small">
@@ -420,14 +421,13 @@
             新增
           </el-button>
         </div>
-        <el-table :data="detailData.trainingList || []" border stripe style="width: 100%; margin-top: 12px">
+        <el-table :data="detailData.trainingRecordList || []" border stripe style="width: 100%; margin-top: 12px">
           <el-table-column prop="trainingName" label="培训名称" width="180" />
           <el-table-column prop="trainingType" label="培训类型" width="120" />
           <el-table-column prop="trainingContent" label="培训内容" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="startDate" label="开始日期" width="120" />
-          <el-table-column prop="endDate" label="结束日期" width="120" />
+          <el-table-column prop="trainingDate" label="培训日期" width="120" />
           <el-table-column prop="trainingHours" label="培训时长(小时)" width="120" />
-          <el-table-column prop="trainingOrg" label="培训机构" width="160" />
+          <el-table-column prop="trainingOrganization" label="培训机构" width="160" />
           <el-table-column label="结果" width="100">
             <template #default="{ row }">
               <el-tag :type="row.result === '合格' ? 'success' : 'danger'" effect="light" size="small">
@@ -484,9 +484,9 @@
         <el-table :data="detailData.certificateList || []" border stripe style="width: 100%; margin-top: 12px">
           <el-table-column prop="certificateName" label="证书名称" width="180" />
           <el-table-column prop="certificateNo" label="证书编号" width="180" />
-          <el-table-column prop="grantOrg" label="发证机构" width="160" />
-          <el-table-column prop="grantDate" label="发证日期" width="120" />
-          <el-table-column prop="validEndDate" label="有效期至" width="120" />
+          <el-table-column prop="issuingAuthority" label="发证机构" width="160" />
+          <el-table-column prop="issueDate" label="发证日期" width="120" />
+          <el-table-column prop="expiryDate" label="有效期至" width="120" />
           <el-table-column label="状态" width="120">
             <template #default="{ row }">
               <el-tag v-if="isCertificateExpired(row)" type="danger" effect="light" size="small">已过期</el-tag>
@@ -527,8 +527,8 @@
         label-width="100px"
       >
         <template v-if="activeSubTab === 'education'">
-          <el-form-item label="学校" prop="school">
-            <el-input v-model="subForm.school" placeholder="请输入学校" />
+          <el-form-item label="毕业院校" prop="graduationSchool">
+            <el-input v-model="subForm.graduationSchool" placeholder="请输入毕业院校" />
           </el-form-item>
           <el-form-item label="专业" prop="major">
             <el-input v-model="subForm.major" placeholder="请输入专业" />
@@ -596,52 +596,69 @@
           <el-form-item label="证书编号" prop="certificateNo">
             <el-input v-model="subForm.certificateNo" placeholder="请输入证书编号" />
           </el-form-item>
-          <el-form-item label="授予日期" prop="grantDate">
+          <el-form-item label="取得日期" prop="acquireDate">
             <el-date-picker
-              v-model="subForm.grantDate"
+              v-model="subForm.acquireDate"
               type="date"
               value-format="YYYY-MM-DD"
               placeholder="选择日期"
               style="width: 100%"
             />
           </el-form-item>
-          <el-form-item label="授予单位" prop="grantOrg">
-            <el-input v-model="subForm.grantOrg" placeholder="请输入授予单位" />
+          <el-form-item label="授予机构" prop="grantingAuthority">
+            <el-input v-model="subForm.grantingAuthority" placeholder="请输入授予机构" />
           </el-form-item>
         </template>
 
         <template v-if="activeSubTab === 'authorization'">
-          <el-form-item label="检测项目" prop="testItem">
-            <el-select v-model="subForm.testItem" placeholder="请选择检测项目" style="width: 100%" filterable>
-              <el-option label="水质检测" value="水质检测" />
-              <el-option label="大气检测" value="大气检测" />
-              <el-option label="土壤检测" value="土壤检测" />
-              <el-option label="噪声检测" value="噪声检测" />
-              <el-option label="固废检测" value="固废检测" />
+          <el-form-item label="授权类型" prop="authorizationType">
+            <el-select v-model="subForm.authorizationType" placeholder="请选择授权类型" style="width: 100%">
+              <el-option label="检测参数授权" value="检测参数授权" />
+              <el-option label="检测方法授权" value="检测方法授权" />
+              <el-option label="仪器操作授权" value="仪器操作授权" />
+              <el-option label="报告签发授权" value="报告签发授权" />
             </el-select>
           </el-form-item>
-          <el-form-item label="检测标准" prop="testStandard">
-            <el-select v-model="subForm.testStandard" placeholder="请选择检测标准" style="width: 100%" filterable>
-              <el-option label="GB 3838-2002 地表水环境质量标准" value="GB 3838-2002 地表水环境质量标准" />
-              <el-option label="GB 3095-2012 环境空气质量标准" value="GB 3095-2012 环境空气质量标准" />
-              <el-option label="GB 15618-2018 土壤环境质量 农用地土壤污染风险管控标准" value="GB 15618-2018 土壤环境质量 农用地土壤污染风险管控标准" />
-              <el-option label="GB 3096-2008 声环境质量标准" value="GB 3096-2008 声环境质量标准" />
+          <el-form-item label="检测项目" prop="itemId">
+            <el-select
+              v-model="subForm.itemId"
+              placeholder="请选择检测项目"
+              style="width: 100%"
+              filterable
+              @change="handleTestItemChange"
+            >
+              <el-option
+                v-for="item in testItemOptions"
+                :key="item.id"
+                :label="item.itemName"
+                :value="item.id"
+              />
             </el-select>
           </el-form-item>
-          <el-form-item label="检测方法" prop="testMethod">
-            <el-select v-model="subForm.testMethod" placeholder="请选择检测方法" style="width: 100%" filterable>
-              <el-option label="原子吸收分光光度法" value="原子吸收分光光度法" />
-              <el-option label="气相色谱法" value="气相色谱法" />
-              <el-option label="高效液相色谱法" value="高效液相色谱法" />
-              <el-option label="离子色谱法" value="离子色谱法" />
-              <el-option label="分光光度法" value="分光光度法" />
+          <el-form-item label="检测标准" prop="standardId">
+            <el-select
+              v-model="subForm.standardId"
+              placeholder="请选择检测标准"
+              style="width: 100%"
+              filterable
+              @change="handleStandardChange"
+            >
+              <el-option
+                v-for="item in standardOptions"
+                :key="item.id"
+                :label="item.standardNo + ' ' + item.standardName"
+                :value="item.id"
+              />
             </el-select>
+          </el-form-item>
+          <el-form-item label="检测方法" prop="methodName">
+            <el-input v-model="subForm.methodName" placeholder="请输入检测方法" />
           </el-form-item>
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-form-item label="授权开始日期" prop="validStartDate">
+              <el-form-item label="授权日期" prop="authorizeDate">
                 <el-date-picker
-                  v-model="subForm.validStartDate"
+                  v-model="subForm.authorizeDate"
                   type="date"
                   value-format="YYYY-MM-DD"
                   placeholder="选择日期"
@@ -650,9 +667,9 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="授权结束日期" prop="validEndDate">
+              <el-form-item label="有效期至" prop="expiryDate">
                 <el-date-picker
-                  v-model="subForm.validEndDate"
+                  v-model="subForm.expiryDate"
                   type="date"
                   value-format="YYYY-MM-DD"
                   placeholder="选择日期"
@@ -681,9 +698,9 @@
           </el-form-item>
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-form-item label="开始日期" prop="startDate">
+              <el-form-item label="培训日期" prop="trainingDate">
                 <el-date-picker
-                  v-model="subForm.startDate"
+                  v-model="subForm.trainingDate"
                   type="date"
                   value-format="YYYY-MM-DD"
                   placeholder="选择日期"
@@ -691,24 +708,13 @@
                 />
               </el-form-item>
             </el-col>
-            <el-col :span="12">
-              <el-form-item label="结束日期" prop="endDate">
-                <el-date-picker
-                  v-model="subForm.endDate"
-                  type="date"
-                  value-format="YYYY-MM-DD"
-                  placeholder="选择日期"
-                  style="width: 100%"
-                />
-              </el-form-item>
-            </el-col>
-          </el-row>
-          <el-row :gutter="16">
             <el-col :span="12">
               <el-form-item label="培训时长(小时)" prop="trainingHours">
                 <el-input-number v-model="subForm.trainingHours" :min="0" style="width: 100%" />
               </el-form-item>
             </el-col>
+          </el-row>
+          <el-row :gutter="16">
             <el-col :span="12">
               <el-form-item label="结果" prop="result">
                 <el-select v-model="subForm.result" placeholder="请选择结果" style="width: 100%">
@@ -717,9 +723,29 @@
                 </el-select>
               </el-form-item>
             </el-col>
+            <el-col :span="12">
+              <el-form-item label="是否获得证书" prop="certificateFlag">
+                <el-select v-model="subForm.certificateFlag" placeholder="请选择" style="width: 100%">
+                  <el-option label="否" :value="0" />
+                  <el-option label="是" :value="1" />
+                </el-select>
+              </el-form-item>
+            </el-col>
           </el-row>
-          <el-form-item label="培训机构" prop="trainingOrg">
-            <el-input v-model="subForm.trainingOrg" placeholder="请输入培训机构" />
+          <el-form-item label="培训机构" prop="trainingOrganization">
+            <el-input v-model="subForm.trainingOrganization" placeholder="请输入培训机构" />
+          </el-form-item>
+          <el-form-item label="证书编号" prop="certificateNo">
+            <el-input v-model="subForm.certificateNo" placeholder="请输入证书编号" />
+          </el-form-item>
+          <el-form-item label="证书到期日期" prop="certificateExpiryDate">
+            <el-date-picker
+              v-model="subForm.certificateExpiryDate"
+              type="date"
+              value-format="YYYY-MM-DD"
+              placeholder="选择日期"
+              style="width: 100%"
+            />
           </el-form-item>
         </template>
 
@@ -774,20 +800,29 @@
         </template>
 
         <template v-if="activeSubTab === 'certificate'">
+          <el-form-item label="证书类型" prop="certificateType">
+            <el-select v-model="subForm.certificateType" placeholder="请选择证书类型" style="width: 100%">
+              <el-option label="上岗证" value="上岗证" />
+              <el-option label="资格证" value="资格证" />
+              <el-option label="操作证" value="操作证" />
+              <el-option label="培训证" value="培训证" />
+              <el-option label="其他" value="其他" />
+            </el-select>
+          </el-form-item>
           <el-form-item label="证书名称" prop="certificateName">
             <el-input v-model="subForm.certificateName" placeholder="请输入证书名称" />
           </el-form-item>
           <el-form-item label="证书编号" prop="certificateNo">
             <el-input v-model="subForm.certificateNo" placeholder="请输入证书编号" />
           </el-form-item>
-          <el-form-item label="发证机构" prop="grantOrg">
-            <el-input v-model="subForm.grantOrg" placeholder="请输入发证机构" />
+          <el-form-item label="发证机构" prop="issuingAuthority">
+            <el-input v-model="subForm.issuingAuthority" placeholder="请输入发证机构" />
           </el-form-item>
           <el-row :gutter="16">
             <el-col :span="12">
-              <el-form-item label="发证日期" prop="grantDate">
+              <el-form-item label="发证日期" prop="issueDate">
                 <el-date-picker
-                  v-model="subForm.grantDate"
+                  v-model="subForm.issueDate"
                   type="date"
                   value-format="YYYY-MM-DD"
                   placeholder="选择日期"
@@ -796,14 +831,29 @@
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="有效期至" prop="validEndDate">
+              <el-form-item label="有效期至" prop="expiryDate">
                 <el-date-picker
-                  v-model="subForm.validEndDate"
+                  v-model="subForm.expiryDate"
                   type="date"
                   value-format="YYYY-MM-DD"
                   placeholder="选择日期"
                   style="width: 100%"
                 />
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row :gutter="16">
+            <el-col :span="12">
+              <el-form-item label="是否提醒" prop="isRemind">
+                <el-select v-model="subForm.isRemind" placeholder="请选择" style="width: 100%">
+                  <el-option label="否" :value="0" />
+                  <el-option label="是" :value="1" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="提醒天数" prop="remindDays">
+                <el-input-number v-model="subForm.remindDays" :min="1" :max="365" style="width: 100%" />
               </el-form-item>
             </el-col>
           </el-row>
@@ -901,19 +951,68 @@ const personnelFormRef = ref(null)
 const subFormRef = ref(null)
 
 const subForm = ref({})
+
+const testItemOptions = ref([
+  { id: 1, itemCode: 'W001', itemName: 'pH值', itemType: '水质检测' },
+  { id: 2, itemCode: 'W002', itemName: '化学需氧量(COD)', itemType: '水质检测' },
+  { id: 3, itemCode: 'W003', itemName: '生化需氧量(BOD5)', itemType: '水质检测' },
+  { id: 4, itemCode: 'W004', itemName: '氨氮', itemType: '水质检测' },
+  { id: 5, itemCode: 'W005', itemName: '总磷', itemType: '水质检测' },
+  { id: 6, itemCode: 'W006', itemName: '总氮', itemType: '水质检测' },
+  { id: 7, itemCode: 'A001', itemName: '二氧化硫', itemType: '大气检测' },
+  { id: 8, itemCode: 'A002', itemName: '氮氧化物', itemType: '大气检测' },
+  { id: 9, itemCode: 'A003', itemName: '颗粒物(PM10)', itemType: '大气检测' },
+  { id: 10, itemCode: 'A004', itemName: '颗粒物(PM2.5)', itemType: '大气检测' },
+  { id: 11, itemCode: 'S001', itemName: '铜', itemType: '土壤检测' },
+  { id: 12, itemCode: 'S002', itemName: '铅', itemType: '土壤检测' },
+  { id: 13, itemCode: 'S003', itemName: '镉', itemType: '土壤检测' },
+  { id: 14, itemCode: 'N001', itemName: '等效连续A声级', itemType: '噪声检测' },
+  { id: 15, itemCode: 'N002', itemName: '昼间等效声级', itemType: '噪声检测' }
+])
+
+const standardOptions = ref([
+  { id: 1, standardNo: 'GB 3838-2002', standardName: '地表水环境质量标准' },
+  { id: 2, standardNo: 'GB 8978-1996', standardName: '污水综合排放标准' },
+  { id: 3, standardNo: 'GB 3095-2012', standardName: '环境空气质量标准' },
+  { id: 4, standardNo: 'GB 16297-1996', standardName: '大气污染物综合排放标准' },
+  { id: 5, standardNo: 'GB 15618-2018', standardName: '土壤环境质量 农用地土壤污染风险管控标准' },
+  { id: 6, standardNo: 'GB 36600-2018', standardName: '土壤环境质量 建设用地土壤污染风险管控标准' },
+  { id: 7, standardNo: 'GB 3096-2008', standardName: '声环境质量标准' },
+  { id: 8, standardNo: 'GB 12348-2008', standardName: '工业企业厂界环境噪声排放标准' },
+  { id: 9, standardNo: 'GB 11607-89', standardName: '渔业水质标准' },
+  { id: 10, standardNo: 'GB 5749-2006', standardName: '生活饮用水卫生标准' }
+])
+
+const handleTestItemChange = (itemId) => {
+  const selectedItem = testItemOptions.value.find(item => item.id === itemId)
+  if (selectedItem) {
+    subForm.value.itemName = selectedItem.itemName
+    subForm.value.itemCode = selectedItem.itemCode
+  }
+}
+
+const handleStandardChange = (standardId) => {
+  const selectedStandard = standardOptions.value.find(item => item.id === standardId)
+  if (selectedStandard) {
+    subForm.value.standardName = selectedStandard.standardName
+    subForm.value.standardNo = selectedStandard.standardNo
+  }
+}
 const subFormRules = {
-  school: [{ required: true, message: '请输入学校', trigger: 'blur' }],
+  graduationSchool: [{ required: true, message: '请输入毕业院校', trigger: 'blur' }],
   major: [{ required: true, message: '请输入专业', trigger: 'blur' }],
   education: [{ required: true, message: '请选择学历', trigger: 'change' }],
   titleName: [{ required: true, message: '请输入职称名称', trigger: 'blur' }],
   titleLevel: [{ required: true, message: '请选择职称级别', trigger: 'change' }],
-  testItem: [{ required: true, message: '请选择检测项目', trigger: 'change' }],
-  testStandard: [{ required: true, message: '请选择检测标准', trigger: 'change' }],
-  testMethod: [{ required: true, message: '请选择检测方法', trigger: 'change' }],
+  authorizationType: [{ required: true, message: '请选择授权类型', trigger: 'change' }],
+  itemId: [{ required: true, message: '请选择检测项目', trigger: 'change' }],
+  standardId: [{ required: true, message: '请选择检测标准', trigger: 'change' }],
+  methodName: [{ required: true, message: '请输入检测方法', trigger: 'blur' }],
   trainingName: [{ required: true, message: '请输入培训名称', trigger: 'blur' }],
   trainingType: [{ required: true, message: '请选择培训类型', trigger: 'change' }],
   assessmentName: [{ required: true, message: '请输入考核名称', trigger: 'blur' }],
   assessmentType: [{ required: true, message: '请选择考核类型', trigger: 'change' }],
+  certificateType: [{ required: true, message: '请选择证书类型', trigger: 'change' }],
   certificateName: [{ required: true, message: '请输入证书名称', trigger: 'blur' }],
   certificateNo: [{ required: true, message: '请输入证书编号', trigger: 'blur' }]
 }
@@ -929,24 +1028,24 @@ const getStatusText = (status) => {
 }
 
 const isCertificateExpired = (row) => {
-  if (!row.validEndDate) return false
+  if (!row.expiryDate) return false
   const now = new Date()
-  const endDate = new Date(row.validEndDate)
+  const endDate = new Date(row.expiryDate)
   return endDate < now
 }
 
 const isCertificateExpiringSoon = (row) => {
-  if (!row.validEndDate) return false
+  if (!row.expiryDate) return false
   const now = new Date()
-  const endDate = new Date(row.validEndDate)
+  const endDate = new Date(row.expiryDate)
   const diffDays = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24))
   return diffDays >= 0 && diffDays <= 30
 }
 
 const getCertificateDays = (row) => {
-  if (!row.validEndDate) return 0
+  if (!row.expiryDate) return 0
   const now = new Date()
-  const endDate = new Date(row.validEndDate)
+  const endDate = new Date(row.expiryDate)
   const diffDays = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24))
   return diffDays
 }
@@ -1014,10 +1113,32 @@ const handleAdd = () => {
   dialogVisible.value = true
 }
 
-const handleEdit = (row) => {
+const fetchAllSubLists = async (personnelId) => {
+  if (!personnelId) return
+  await Promise.all([
+    fetchSubList('education'),
+    fetchSubList('title'),
+    fetchSubList('authorization'),
+    fetchSubList('training'),
+    fetchSubList('assessment'),
+    fetchSubList('certificate')
+  ])
+}
+
+const handleEdit = async (row) => {
   isView.value = false
   dialogTitle.value = '编辑人员'
   personnelForm.value = { ...row }
+  detailLoading.value = true
+  try {
+    const res = await personnelApi.get(row.id)
+    if (res.code === 200) {
+      personnelForm.value = { ...res.data }
+      detailData.value = res.data
+    }
+  } finally {
+    detailLoading.value = false
+  }
   dialogVisible.value = true
 }
 
@@ -1077,13 +1198,15 @@ const initSubForm = () => {
     education: {
       id: null,
       personnelId: null,
-      school: '',
+      graduationSchool: '',
       major: '',
       education: '',
       degree: '',
       startDate: '',
       endDate: '',
-      certificateNo: ''
+      certificateNo: '',
+      isFullTime: 1,
+      remark: ''
     },
     title: {
       id: null,
@@ -1091,30 +1214,41 @@ const initSubForm = () => {
       titleName: '',
       titleLevel: '',
       certificateNo: '',
-      grantDate: '',
-      grantOrg: ''
+      acquireDate: '',
+      grantingAuthority: '',
+      remark: ''
     },
     authorization: {
       id: null,
       personnelId: null,
-      testItem: '',
-      testStandard: '',
-      testMethod: '',
-      validStartDate: '',
-      validEndDate: '',
-      status: 1
+      authorizationType: '',
+      itemId: null,
+      itemName: '',
+      itemCode: '',
+      standardId: null,
+      standardName: '',
+      standardNo: '',
+      methodName: '',
+      authorizeDate: '',
+      expiryDate: '',
+      status: 1,
+      remark: ''
     },
     training: {
       id: null,
       personnelId: null,
+      personnelName: '',
       trainingName: '',
       trainingType: '',
       trainingContent: '',
-      startDate: '',
-      endDate: '',
+      trainingDate: '',
       trainingHours: null,
-      trainingOrg: '',
-      result: ''
+      trainingOrganization: '',
+      certificateFlag: 0,
+      certificateNo: '',
+      certificateExpiryDate: '',
+      result: '',
+      remark: ''
     },
     assessment: {
       id: null,
@@ -1125,16 +1259,22 @@ const initSubForm = () => {
       assessmentDate: '',
       assessmentOrg: '',
       score: null,
-      result: ''
+      result: '',
+      remark: ''
     },
     certificate: {
       id: null,
       personnelId: null,
+      certificateType: '',
       certificateName: '',
       certificateNo: '',
-      grantOrg: '',
-      grantDate: '',
-      validEndDate: ''
+      issuingAuthority: '',
+      issueDate: '',
+      expiryDate: '',
+      isRemind: 1,
+      remindDays: 30,
+      status: 1,
+      remark: ''
     }
   }
   return subFormMap[activeSubTab.value] || {}
@@ -1167,11 +1307,19 @@ const handleEditEducation = (row) => {
   subDialogVisible.value = true
 }
 
-const handleDeleteEducation = (row) => {
-  ElMessageBox.confirm('确定要删除该学历经历吗？', '提示', { type: 'warning' }).then(async () => {
-    ElMessage.success('删除成功')
-    detailData.value.educationList = detailData.value.educationList.filter(item => item.id !== row.id)
-  }).catch(() => {})
+const handleDeleteEducation = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该学历经历吗？', '提示', { type: 'warning' })
+    const res = await personnelApi.educationDelete(row.id)
+    if (res.code === 200) {
+      ElMessage.success('删除成功')
+      await fetchSubList('education')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
 }
 
 const handleAddTitle = () => {
@@ -1189,11 +1337,19 @@ const handleEditTitle = (row) => {
   subDialogVisible.value = true
 }
 
-const handleDeleteTitle = (row) => {
-  ElMessageBox.confirm('确定要删除该职称吗？', '提示', { type: 'warning' }).then(async () => {
-    ElMessage.success('删除成功')
-    detailData.value.titleList = detailData.value.titleList.filter(item => item.id !== row.id)
-  }).catch(() => {})
+const handleDeleteTitle = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该职称吗？', '提示', { type: 'warning' })
+    const res = await personnelApi.titleDelete(row.id)
+    if (res.code === 200) {
+      ElMessage.success('删除成功')
+      await fetchSubList('title')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
 }
 
 const handleAddAuthorization = () => {
@@ -1211,17 +1367,33 @@ const handleEditAuthorization = (row) => {
   subDialogVisible.value = true
 }
 
-const handleToggleAuthorization = (row) => {
-  const newStatus = row.status === 1 ? 0 : 1
-  row.status = newStatus
-  ElMessage.success(newStatus === 1 ? '已启用' : '已停用')
+const handleToggleAuthorization = async (row) => {
+  try {
+    const newStatus = row.status === 1 ? 0 : 1
+    const apiMethod = newStatus === 1 ? 'authorizationEnable' : 'authorizationDisable'
+    const res = await personnelApi[apiMethod](row.id)
+    if (res.code === 200) {
+      row.status = newStatus
+      ElMessage.success(newStatus === 1 ? '已启用' : '已停用')
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
-const handleDeleteAuthorization = (row) => {
-  ElMessageBox.confirm('确定要删除该授权项目吗？', '提示', { type: 'warning' }).then(async () => {
-    ElMessage.success('删除成功')
-    detailData.value.authorizationList = detailData.value.authorizationList.filter(item => item.id !== row.id)
-  }).catch(() => {})
+const handleDeleteAuthorization = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该授权项目吗？', '提示', { type: 'warning' })
+    const res = await personnelApi.authorizationDelete(row.id)
+    if (res.code === 200) {
+      ElMessage.success('删除成功')
+      await fetchSubList('authorization')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
 }
 
 const handleAddTraining = () => {
@@ -1239,11 +1411,19 @@ const handleEditTraining = (row) => {
   subDialogVisible.value = true
 }
 
-const handleDeleteTraining = (row) => {
-  ElMessageBox.confirm('确定要删除该培训记录吗？', '提示', { type: 'warning' }).then(async () => {
-    ElMessage.success('删除成功')
-    detailData.value.trainingList = detailData.value.trainingList.filter(item => item.id !== row.id)
-  }).catch(() => {})
+const handleDeleteTraining = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该培训记录吗？', '提示', { type: 'warning' })
+    const res = await personnelApi.trainingRecordDelete(row.id)
+    if (res.code === 200) {
+      ElMessage.success('删除成功')
+      await fetchSubList('trainingRecord')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
 }
 
 const handleAddAssessment = () => {
@@ -1261,11 +1441,19 @@ const handleEditAssessment = (row) => {
   subDialogVisible.value = true
 }
 
-const handleDeleteAssessment = (row) => {
-  ElMessageBox.confirm('确定要删除该考核记录吗？', '提示', { type: 'warning' }).then(async () => {
-    ElMessage.success('删除成功')
-    detailData.value.assessmentList = detailData.value.assessmentList.filter(item => item.id !== row.id)
-  }).catch(() => {})
+const handleDeleteAssessment = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该考核记录吗？', '提示', { type: 'warning' })
+    const res = await personnelApi.assessmentDelete(row.id)
+    if (res.code === 200) {
+      ElMessage.success('删除成功')
+      await fetchSubList('assessment')
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
 }
 
 const handleAddCertificate = () => {
@@ -1283,33 +1471,64 @@ const handleEditCertificate = (row) => {
   subDialogVisible.value = true
 }
 
-const handleDeleteCertificate = (row) => {
-  ElMessageBox.confirm('确定要删除该上岗证吗？', '提示', { type: 'warning' }).then(async () => {
-    ElMessage.success('删除成功')
-    detailData.value.certificateList = detailData.value.certificateList.filter(item => item.id !== row.id)
-    fetchStats()
-  }).catch(() => {})
+const handleDeleteCertificate = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除该上岗证吗？', '提示', { type: 'warning' })
+    const res = await personnelApi.certificateDelete(row.id)
+    if (res.code === 200) {
+      ElMessage.success('删除成功')
+      await fetchSubList('certificate')
+      fetchStats()
+    }
+  } catch (e) {
+    if (e !== 'cancel') {
+      console.error(e)
+    }
+  }
+}
+
+const apiMap = {
+  education: { save: 'educationSave', update: 'educationUpdate', listKey: 'educationList', listApi: 'educationList' },
+  title: { save: 'titleSave', update: 'titleUpdate', listKey: 'titleList', listApi: 'titleList' },
+  authorization: { save: 'authorizationSave', update: 'authorizationUpdate', listKey: 'authorizationList', listApi: 'authorizationList' },
+  training: { save: 'trainingRecordSave', update: 'trainingRecordUpdate', listKey: 'trainingRecordList', listApi: 'trainingRecordList' },
+  assessment: { save: 'assessmentSave', update: 'assessmentUpdate', listKey: 'assessmentList', listApi: 'assessmentList' },
+  certificate: { save: 'certificateSave', update: 'certificateUpdate', listKey: 'certificateList', listApi: 'certificateList' }
+}
+
+const fetchSubList = async (subTab) => {
+  const tab = subTab || activeSubTab.value
+  const config = apiMap[tab]
+  if (!config || !personnelForm.value.id) return
+  try {
+    const res = await personnelApi[config.listApi](personnelForm.value.id)
+    if (res.code === 200) {
+      detailData.value[config.listKey] = res.data
+    }
+  } catch (e) {
+    console.error(e)
+  }
 }
 
 const handleSubSubmit = async () => {
   if (!subFormRef.value) return
   try {
     await subFormRef.value.validate()
-    const listKey = activeSubTab.value + 'List'
-    if (!detailData.value[listKey]) {
-      detailData.value[listKey] = []
-    }
+    const config = apiMap[activeSubTab.value]
+    if (!config) return
     if (subForm.value.id) {
-      const index = detailData.value[listKey].findIndex(item => item.id === subForm.value.id)
-      if (index !== -1) {
-        detailData.value[listKey][index] = { ...subForm.value }
+      const res = await personnelApi[config.update](subForm.value)
+      if (res.code === 200) {
+        ElMessage.success('更新成功')
       }
     } else {
-      subForm.value.id = Date.now()
-      detailData.value[listKey].push({ ...subForm.value })
+      const res = await personnelApi[config.save](subForm.value)
+      if (res.code === 200) {
+        ElMessage.success('新增成功')
+      }
     }
-    ElMessage.success(subForm.value.id ? '更新成功' : '新增成功')
     subDialogVisible.value = false
+    await fetchSubList()
     if (activeSubTab.value === 'certificate') {
       fetchStats()
     }
